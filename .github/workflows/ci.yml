@@ -1,0 +1,56 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse all PowerShell scripts
+        shell: pwsh
+        run: |
+          $fails = @()
+          $scripts = @(Get-ChildItem -Recurse -Filter *.ps1)
+          foreach ($s in $scripts) {
+            $t = $null; $e = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($s.FullName, [ref]$t, [ref]$e) | Out-Null
+            if ($e.Count -gt 0) { $fails += "$($s.Name): $($e[0].Message)" }
+          }
+          if ($fails.Count -gt 0) { $fails; exit 1 }
+          "PARSE-CLEAN ($($scripts.Count) scripts)"
+
+      - name: Validate JSON (configs + task cards)
+        shell: pwsh
+        run: |
+          $files = @(Get-ChildItem wise-counsil/config/*.json) + @(Get-ChildItem eval/*.json) + @(Get-ChildItem eval/tasks/*.json -ErrorAction SilentlyContinue)
+          if ($files.Count -eq 0) { "no JSON found"; exit 1 }
+          foreach ($f in $files) { Get-Content $f.FullName -Raw | ConvertFrom-Json | Out-Null }
+          "JSON-OK ($($files.Count) files)"
+
+      - name: Lint (PSScriptAnalyzer)
+        shell: pwsh
+        run: |
+          if (-not (Get-Module -ListAvailable PSScriptAnalyzer)) {
+            Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          }
+          $r = Invoke-ScriptAnalyzer -Path . -Settings ./PSScriptAnalyzerSettings.psd1 -Recurse
+          $r | Format-Table -AutoSize
+          if ($r) { exit 1 }
+
+      - name: Installer smoke (offline, runner-home only)
+        shell: pwsh
+        run: pwsh -NoProfile -File wise-counsil/scripts/Install-WiseCounsil.ps1 -OpenCode -Claude -SkipValidation
+
+      - name: Eval dry-run (offline end-to-end, zero spend)
+        shell: pwsh
+        run: pwsh -NoProfile -File eval/Invoke-DryRunSmoke.ps1

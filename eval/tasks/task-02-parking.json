@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-parking",
+  "track": 1,
+  "archetype": "domain-rule-calculator",
+  "language": "python",
+  "public_brief": "Write a Python function `parking_fee(entry_minute, exit_minute)` for a downtown parking garage. Both arguments are minutes since midnight. Return what the driver owes, in dollars, as a float. Apply the garage's standard posted rate rules, including the edge cases a real garage has to handle. Include a few unit tests of your own. No external libraries.",
+  "entry_contract": "Exact function name and signature `parking_fee(entry_minute, exit_minute)`, returning the fee in dollars as a float.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "A stay of 15 minutes or less is free (grace window)." },
+    { "id": "R2", "rule": "After grace the fee is 2.75 per started half-hour counted from the entry minute, never prorated: 16 minutes bills one block, 31 bills two." },
+    { "id": "R3", "rule": "No stay is billed more than the 25.00 daily cap." },
+    { "id": "R4", "rule": "A lost ticket is signalled by exit_minute = None and bills a flat 40.00, ignoring grace and the daily cap." },
+    { "id": "R5", "rule": "exit_minute earlier than entry_minute must raise ValueError; overnight wrapping is not supported (equal minutes is a free stay)." },
+    { "id": "R6", "rule": "entry_minute and exit_minute must be whole minutes in 0..1439; negative, 1440-plus, fractional or non-numeric values raise ValueError (None is allowed only for exit_minute)." },
+    { "id": "R7", "rule": "The return value is a plain float rounded to 2 decimals - not Decimal, int, or str, and free of float artifacts." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "grace period", "answer": "Every garage gives a short free loading window; a stay inside it costs nothing." },
+    { "id": "R2", "topic": "increment billing", "answer": "After grace, each started half-hour is one full block at the posted rate, counted from entry - never prorated." },
+    { "id": "R3", "topic": "daily maximum", "answer": "Nobody pays past the daily ceiling; extra half-hours stop adding cost once the cap is hit." },
+    { "id": "R4", "topic": "lost ticket", "answer": "A missing exit means lost ticket: one flat fee, no grace window, no daily cap." },
+    { "id": "R5", "topic": "reversed times", "answer": "Exit before entry is bad data, not a negative bill - raise, and let the caller split multi-day stays." },
+    { "id": "R6", "topic": "minute validation", "answer": "Minutes since midnight only run 0 through 1439; negative, fractional, or non-numeric values are rejected." },
+    { "id": "R7", "topic": "money type", "answer": "Return a plain float at two decimals - not Decimal, not an int, not a string." },
+    { "id": "X1", "topic": "validation stickers", "answer": "Out of scope - handled elsewhere." },
+    { "id": "X2", "topic": "ev charging", "answer": "Out of scope - handled elsewhere." }
+  ],
+  "tests_file": "tests-02-parking.py",
+  "reference_solution": "ref-02-parking.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules come from common US commercial-garage posted-rate conventions: a short free grace window, per-started-increment billing, a daily maximum, a flat lost-ticket fee, and refusal of reversed timestamps."
+  }
+}

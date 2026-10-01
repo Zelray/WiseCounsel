@@ -1,0 +1,25 @@
+{
+  "provider": "openrouter",
+  "defaultPreset": "balanced-six",
+  "minModels": 2,
+  "maxModels": 6,
+  "models": [
+    { "id": "deepseek/deepseek-v4.1-flash", "label": "ds-flash", "family": "DeepSeek" },
+    { "id": "qwen/qwen3.8-27b:free", "label": "qwen", "family": "Alibaba" },
+    { "id": "mistralai/mistral-small-2603", "label": "mistral", "family": "Mistral" },
+    { "id": "openai/gpt-oss-120b", "label": "gpt-oss", "family": "OpenAI-open" },
+    { "id": "meta-llama/llama-4-scout", "label": "llama4", "family": "Meta" },
+    { "id": "google/gemma-4-31b-it:free", "label": "gemma", "family": "Google" }
+  ],
+  "limits": {
+    "maxOutputTokens": 1200,
+    "timeoutSec": 90,
+    "temperaturePremortem": 0.4,
+    "temperatureDebate": 0.7
+  },
+  "keySource": "auto",
+  "opencodego": {
+    "enabled": false,
+    "agentsNamespace": "wisecounsil"
+  }
+}

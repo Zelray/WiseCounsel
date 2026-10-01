@@ -1,0 +1,36 @@
+{
+  "executor": {
+    "id": "google/gemini-2.5-flash",
+    "temperature": 0.0,
+    "maxTokens": 4096,
+    "timeoutSec": 180
+  },
+  "matcher": {
+    "id": "google/gemini-2.5-flash",
+    "temperature": 0.0,
+    "maxTokens": 512,
+    "timeoutSec": 120
+  },
+  "judges": [
+    { "id": "anthropic/claude-haiku-4.5", "temperature": 0.0, "maxTokens": 512, "timeoutSec": 120 },
+    { "id": "openai/gpt-5-mini", "temperature": 0.0, "maxTokens": 512, "timeoutSec": 120 },
+    { "id": "google/gemini-2.5-flash", "temperature": 0.0, "maxTokens": 512, "timeoutSec": 120 }
+  ],
+  "armProbe": true,
+  "council": {
+    "scriptPath": "wise-counsil/scripts/Invoke-WiseCounsil.ps1",
+    "preset": "balanced-six",
+    "timeoutSec": 240
+  },
+  "singleCritic": {
+    "id": "mistralai/mistral-small-2603",
+    "temperature": 0.4,
+    "maxTokens": 1200,
+    "timeoutSec": 120
+  },
+  "budget": {
+    "maxSpendUsd": 6.0
+  },
+  "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+  "notes": "Model IDs validated against the live OpenRouter catalog 2026-10-01. Judge families are absent from the council roster (DeepSeek/Qwen/Mistral/gpt-oss/Llama/Gemma); the executor-family judge overlap cancels across arms and is disclosed in docs/EVAL-DESIGN.md."
+}

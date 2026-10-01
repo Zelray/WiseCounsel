@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-username-validator",
+  "track": 1,
+  "archetype": "input-validation",
+  "language": "python",
+  "public_brief": "You are building the username field for a website signup form. Implement validate_username(username), which receives exactly what the user typed into the field and answers one question: may this name be registered? Return True when the name can be accepted as-is and False when it must be rejected. The validator sits in front of account creation, so treat it as a gate for anything the site would not want as a username. Keep it a pure function: no printing, no prompting, no filesystem or network access. Graders call it directly with ordinary names and with messy values - odd types, padded text, reserved-sounding words - and compare what comes back, so every input path needs a defined answer.",
+  "entry_contract": "Implement validate_username(username) taking one positional argument of any type and returning a strict bool (True or False) for every input.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "The name must be between 3 and 20 characters long, counting the string exactly as typed; shorter or longer is rejected." },
+    { "id": "R2", "rule": "Only ASCII letters, digits, and underscore are allowed; spaces, hyphens, dots, accented or non-Latin characters, and emoji make it False." },
+    { "id": "R3", "rule": "The name must begin with a letter, never a digit or an underscore." },
+    { "id": "R4", "rule": "The reserved names admin, administrator, root, moderator, support, and system are rejected case-insensitively on exact match, while longer names that merely contain one of them (e.g. adminuser) are allowed." },
+    { "id": "R5", "rule": "Leading or trailing whitespace makes the name False exactly as typed; the validator never trims before judging." },
+    { "id": "R6", "rule": "At most two identical characters may appear consecutively; a run of three or more of the same character is rejected as keyboard mashing." },
+    { "id": "R7", "rule": "None or any non-string argument returns False and never raises; the form always gets a boolean answer." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "length bounds", "answer": "Three to twenty characters inclusive. Shorter looks like a stub, longer clutters the roster." },
+    { "id": "R2", "topic": "allowed charset", "answer": "Letters, digits, underscore only - ASCII. No spaces, hyphens, dots, accents, or emoji." },
+    { "id": "R3", "topic": "first character", "answer": "Must open with a letter. A digit or underscore up front reads machine-generated." },
+    { "id": "R4", "topic": "reserved names", "answer": "Six reserved names, exact match, case-insensitive. adminuser or roots still passes - they aren't the reserved word." },
+    { "id": "R5", "topic": "whitespace", "answer": "Padded input fails as typed. We never trim for them; sloppy entry is the user's problem." },
+    { "id": "R6", "topic": "repeat runs", "answer": "Two of the same character in a row is fine. Three or more is keyboard mashing, so reject." },
+    { "id": "R7", "topic": "bad input type", "answer": "Anything that isn't text comes back False - here we answer, we never throw. Opposite of the phone task on purpose." },
+    { "id": "X1", "topic": "password rules", "answer": "Out of scope - this validator judges usernames only; password strength lives elsewhere." },
+    { "id": "X2", "topic": "availability check", "answer": "Out of scope - no database lookup; pure predicate on the string. Duplicate handling is the signup service's job." }
+  ],
+  "tests_file": "tests-03-username-validator.py",
+  "reference_solution": "ref-03-username-validator.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream web-signup username conventions (bounded length, ASCII alnum-plus-underscore charset, letter-first rule, reserved-name blocklists, no-trim policy, repeat-run limits), not from any WiseCounsil design document."
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "task_id": "T1-cutoff-dates",
+  "track": 1,
+  "archetype": "date-logic",
+  "language": "python",
+  "public_brief": "Write `ship_date(order_datetime, holidays)` for a small storefront's fulfillment queue. It answers one operational question: given when an order came in, on which calendar day does its box leave the warehouse? Orders never leave the same day they are placed. The warehouse does not work every day of the week, and on some days of the year nobody ships at all. `holidays` is any collection of `datetime.date` objects (possibly empty) marking the dark days. Accept whatever date-ish value the caller hands you and return a `datetime.date`. Standard library only — `datetime` is all you should need.",
+  "entry_contract": "Function `ship_date(order_datetime, holidays)` that accepts a datetime.datetime or datetime.date plus a collection of datetime.date, and returns a datetime.date.",
+  "hidden_spec": [
+    {
+      "id": "R1",
+      "rule": "An order placed before 14:00 local ships on the first business day strictly after the order date."
+    },
+    {
+      "id": "R2",
+      "rule": "An order placed at or after 14:00 (inclusive of 14:00:00) misses the cutoff and ships one business day later than the R1 answer."
+    },
+    {
+      "id": "R3",
+      "rule": "A business day is Monday through Friday that is not present in the holidays collection."
+    },
+    {
+      "id": "R4",
+      "rule": "The returned date is always a business day: roll forward day by day past weekends and listed holidays until an open day is reached."
+    },
+    {
+      "id": "R5",
+      "rule": "A bare datetime.date input is normalized to that day at 12:00 (noon), which counts as before the cutoff."
+    },
+    {
+      "id": "R6",
+      "rule": "An empty holidays collection is valid; with no holidays only weekends are skipped."
+    },
+    {
+      "id": "R7",
+      "rule": "A holiday that falls on a weekend adds no extra delay: the weekend roll already covers it, so the answer is unchanged."
+    },
+    {
+      "id": "R8",
+      "rule": "Rolling ignores year boundaries: an order on Dec 31 with Jan 1 as a holiday resolves into early January of the next year."
+    }
+  ],
+  "answer_sheet": [
+    {
+      "id": "R1",
+      "topic": "cutoff morning",
+      "answer": "Before 14:00 local the order makes the truck — it ships the next business day."
+    },
+    {
+      "id": "R2",
+      "topic": "cutoff afternoon",
+      "answer": "At or after 14:00 the truck already left — add one more business day of lead time."
+    },
+    {
+      "id": "R3",
+      "topic": "business day",
+      "answer": "Business day means Monday to Friday, minus anything sitting in the holidays list."
+    },
+    {
+      "id": "R4",
+      "topic": "roll forward",
+      "answer": "Never land the ship date on a dark day — keep rolling forward to the next open one."
+    },
+    {
+      "id": "R5",
+      "topic": "loose input",
+      "answer": "A bare date counts as noon that day, comfortably inside the cutoff window."
+    },
+    {
+      "id": "R6",
+      "topic": "empty list",
+      "answer": "Empty holidays is a normal case — only weekends get skipped then."
+    },
+    {
+      "id": "R7",
+      "topic": "weekend holiday",
+      "answer": "A holiday that lands on a weekend adds nothing — the weekend already ate that day."
+    },
+    {
+      "id": "R8",
+      "topic": "year boundary",
+      "answer": "Rolling pays no attention to the year wall — Dec 31 orders land in January."
+    },
+    {
+      "id": "X1",
+      "topic": "timezone handling",
+      "answer": "Convert the order time to the warehouse timezone before applying the cutoff. Not graded — invented detail."
+    },
+    {
+      "id": "X2",
+      "topic": "friday cutoff",
+      "answer": "The cutoff moves earlier on Fridays. Not graded — invented detail."
+    }
+  ],
+  "tests_file": "tests-06-cutoff-dates.py",
+  "reference_solution": "ref-06-cutoff-dates.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules distilled from standard retail/warehouse fulfilment conventions (order cutoff times, next-business-day shipping, holiday-observed dark days, forward rolling), not from any WiseCounsil design document."
+  }
+}

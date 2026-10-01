@@ -1,0 +1,101 @@
+{
+  "task_id": "T1-order-lifecycle",
+  "track": 1,
+  "archetype": "state-machine",
+  "language": "python",
+  "public_brief": "Implement an `Order` class for a small e-commerce backend. The constructor takes no required arguments and exposes a public attribute `status` holding a lowercase string. Provide methods `pay()`, `ship()`, `deliver()`, and `cancel(reason)`. An order moves through its working life as payment is captured, the box leaves the building, and the customer finally has it in hand. Customers can also walk away from an order before or after paying, and the state the order ends up in must reflect honestly what happened to the money. Each method's effect must be visible in `status`. No persistence, no events, no notification hooks — just the object and its state.",
+  "entry_contract": "Class `Order` with `__init__(self)`, `pay()`, `ship()`, `deliver()`, `cancel(reason)`; public attribute `status` (lowercase str) readable after every call.",
+  "hidden_spec": [
+    {
+      "id": "R1",
+      "rule": "A new Order starts at status 'created'; pay() moves created->paid, ship() moves paid->shipped, deliver() moves shipped->delivered."
+    },
+    {
+      "id": "R2",
+      "rule": "Any move not in that flow raises ValueError with the exact message 'illegal transition: <from> -> <to>', where <to> is the method's target state (pay->'paid', ship->'shipped', deliver->'delivered', cancel->'cancelled')."
+    },
+    {
+      "id": "R3",
+      "rule": "Calling pay() on an order already in 'paid' is idempotent: no exception is raised and status stays 'paid'."
+    },
+    {
+      "id": "R4",
+      "rule": "cancel() from 'created' sets status to 'cancelled'; cancel() from 'paid' sets status to 'refunded' (never 'cancelled')."
+    },
+    {
+      "id": "R5",
+      "rule": "'delivered', 'refunded' and 'cancelled' are terminal states: every method call on a terminal order raises ValueError per R2."
+    },
+    {
+      "id": "R6",
+      "rule": "ship() requires a paid order: ship() from 'created' raises ValueError 'illegal transition: created -> shipped'."
+    },
+    {
+      "id": "R7",
+      "rule": "deliver() requires a shipped order: deliver() from 'created' or 'paid' raises ValueError, and a rejected call leaves status unchanged."
+    },
+    {
+      "id": "R8",
+      "rule": "Shipping is the point of no return: cancel() from 'shipped' raises ValueError 'illegal transition: shipped -> cancelled' and status stays 'shipped'."
+    }
+  ],
+  "answer_sheet": [
+    {
+      "id": "R1",
+      "topic": "starting state",
+      "answer": "Born 'created'; pay, ship, deliver walk it created, paid, shipped, delivered — the happy path."
+    },
+    {
+      "id": "R2",
+      "topic": "bad moves",
+      "answer": "Anything off-script raises ValueError('illegal transition: X -> Y') with both state names spelled out."
+    },
+    {
+      "id": "R3",
+      "topic": "double payment",
+      "answer": "Paying twice is a no-op — stays 'paid', no error; duplicate payment capture must be harmless."
+    },
+    {
+      "id": "R4",
+      "topic": "cancel vs refund",
+      "answer": "Cancel before money moves is 'cancelled'; after payment it is 'refunded'. Money-honest labels."
+    },
+    {
+      "id": "R5",
+      "topic": "terminal states",
+      "answer": "delivered, refunded, cancelled are ends of the line — any further call raises."
+    },
+    {
+      "id": "R6",
+      "topic": "ship gate",
+      "answer": "No payment, no shipment: ship() only fires from 'paid'."
+    },
+    {
+      "id": "R7",
+      "topic": "deliver gate",
+      "answer": "deliver() only fires from 'shipped', and a rejected call leaves the state untouched."
+    },
+    {
+      "id": "R8",
+      "topic": "point of no return",
+      "answer": "Once shipped the box is in transit — no cancellations, raise instead."
+    },
+    {
+      "id": "X1",
+      "topic": "tracking numbers",
+      "answer": "ship() assigns a carrier tracking number attribute. Not graded — invented detail."
+    },
+    {
+      "id": "X2",
+      "topic": "transition timestamps",
+      "answer": "Each transition stamps a UTC timestamp on the order. Not graded — invented detail."
+    }
+  ],
+  "tests_file": "tests-05-order-lifecycle.py",
+  "reference_solution": "ref-05-order-lifecycle.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules distilled from standard e-commerce order-management conventions (payment/fulfilment lifecycle, refund-vs-cancel accounting, idempotent payment capture, no-cancelling-in-transit), not from any WiseCounsil design document."
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "task_id": "T1-overtime",
+  "track": 1,
+  "archetype": "domain-rule-calculator",
+  "language": "python",
+  "public_brief": "Write a Python function `calc_pay(hours, rate)` for weekly hourly pay. Handle overtime. Return a dict with keys `regular_pay`, `overtime_pay`, `total`. Include a few unit tests of your own. No external libraries.",
+  "entry_contract": "Exact function name and signature `calc_pay(hours, rate)`, returning a dict of three float values keyed `regular_pay`, `overtime_pay`, `total`.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Overtime starts after 40 hours in the week; exactly 40 hours is all regular time." },
+    { "id": "R2", "rule": "Overtime hours 41 through 50 are paid at 1.5x the rate, and hours above 50 are paid at 2.0x." },
+    { "id": "R3", "rule": "hours greater than 60 must raise ValueError." },
+    { "id": "R4", "rule": "rate below 12.00 must raise ValueError." },
+    { "id": "R5", "rule": "Negative or non-numeric hours must raise ValueError with the message 'hours must be non-negative'; a non-numeric rate must raise ValueError." },
+    { "id": "R6", "rule": "Money is rounded HALF-UP to cents, never with Python's banker's rounding." },
+    { "id": "R7", "rule": "All three dict values are floats rounded to 2 decimals, and total equals regular_pay plus overtime_pay." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "overtime threshold", "answer": "Standard US rule: overtime begins past 40 hours in the week, never before." },
+    { "id": "R2", "topic": "overtime multipliers", "answer": "Time-and-a-half through hour fifty, double time beyond that - the premium banding payrollers expect." },
+    { "id": "R3", "topic": "weekly hour cap", "answer": "Over sixty hours in a week is not payable - refuse the input outright." },
+    { "id": "R4", "topic": "minimum rate", "answer": "Reject hourly rates below the twelve dollar floor; a sub-minimum quote is not a real wage." },
+    { "id": "R5", "topic": "bad input", "answer": "Negative or non-numeric hours use the exact non-negative-hours message; a bad rate just raises." },
+    { "id": "R6", "topic": "money rounding", "answer": "Round money half-up to cents the way an invoice would - never banker's rounding." },
+    { "id": "R7", "topic": "return shape", "answer": "Three float keys at two decimals, and total is exactly regular plus overtime." },
+    { "id": "X1", "topic": "benefits", "answer": "Out of scope - handled elsewhere." }
+  ],
+  "tests_file": "tests-01-overtime.py",
+  "reference_solution": "ref-01-overtime.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules come from standard US weekly-overtime payroll conventions (40-hour trigger, premium banding, minimum-wage floor, weekly hour cap) plus invoice-style half-up cent rounding."
+  }
+}

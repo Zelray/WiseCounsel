@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-phone-normalizer",
+  "track": 1,
+  "archetype": "input-validation",
+  "language": "python",
+  "public_brief": "Our signup form takes phone numbers as free text, and people type them every which way: dashes, dots, parentheses, stray country prefixes, extensions, odd spacing. Implement normalize_phone(raw), which takes one raw string exactly as typed and returns a cleaned, canonical string the CRM can store. Input you cannot confidently clean needs a defined outcome too - decide whether that means raising an exception or returning something obviously unusable, and be consistent about it. Keep it a pure function using only the standard library. Graders call it directly with everyday numbers in assorted shapes plus messy edge cases; they compare returned strings exactly - spacing and punctuation count - or catch an exception and read its message.",
+  "entry_contract": "Implement normalize_phone(raw) taking one positional argument and returning a str; unusable input must not come back as a phone-shaped string.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "None, non-string input, blank or whitespace-only input, or input with no digits at all raises ValueError whose message contains 'empty'." },
+    { "id": "R2", "rule": "Any alphabetic character outside a valid extension marker raises ValueError whose message contains 'letters'; never translate letters to digits." },
+    { "id": "R3", "rule": "An extension is introduced by x or ext (case-insensitive, optional dot, optional space) at the end of the input and keeps one to five digits, and it is appended to the formatted number as ', ext. NNNN'; a missing or over-long extension number raises ValueError whose message contains 'extension'." },
+    { "id": "R4", "rule": "Every non-digit character is stripped before measuring or formatting, and a ten-digit number formats exactly as (AAA) BBB-CCCC." },
+    { "id": "R5", "rule": "Eleven digits beginning with 1 are treated as a country-code prefix: drop the leading 1 and apply the ten-digit format." },
+    { "id": "R6", "rule": "Fewer than ten digits after cleanup raises ValueError whose message contains 'short'; never pad or invent missing digits." },
+    { "id": "R7", "rule": "More than eleven digits, or eleven digits that do not begin with 1, raises ValueError whose message contains 'long'." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "blank input", "answer": "None, empty, whitespace-only, or digit-free input raises ValueError 'empty'. Never a silent empty string." },
+    { "id": "R2", "topic": "letters", "answer": "Real letters outside an extension marker raise ValueError 'letters not allowed'. No vanity-number word mapping." },
+    { "id": "R3", "topic": "extensions", "answer": "Marker is x or ext, case-insensitive. Keep it as ', ext. NNNN', one to five digits, else ValueError 'bad extension'." },
+    { "id": "R4", "topic": "ten digits", "answer": "Strip separators, then ten digits format as (AAA) BBB-CCCC. Exact punctuation - the CRM keys on it." },
+    { "id": "R5", "topic": "leading one", "answer": "A leading 1 is our country code: drop it, then format the remaining digits normally." },
+    { "id": "R6", "topic": "too short", "answer": "Under the digit floor raises ValueError 'too short'. Never pad or guess missing digits." },
+    { "id": "R7", "topic": "too long", "answer": "More digits than the long form allows - or a long form without the leading 1 - raises ValueError 'too long'." },
+    { "id": "X1", "topic": "international formats", "answer": "Out of scope - single-country form; no country-code table, no per-region rulebook. Only our leading-1 prefix is handled." },
+    { "id": "X2", "topic": "line-type lookup", "answer": "Out of scope - we normalize typed text; carrier, geography, and line-type lookups live in other services." }
+  ],
+  "tests_file": "tests-04-phone-normalizer.py",
+  "reference_solution": "ref-04-phone-normalizer.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from North American telco/form conventions (separator-stripping, ten-digit local format, optional leading country code, x/ext extensions, under/over-length rejection), not from any WiseCounsil design document."
+  }
+}

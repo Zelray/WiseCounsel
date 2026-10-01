@@ -1,0 +1,29 @@
+{
+  "task_id": "T2-payment-processor",
+  "track": 2,
+  "archetype": "decision-recommendation",
+  "language": "markdown",
+  "public_brief": "We run an online store doing about $30k/month, all US cards, on Stripe. Our processor fees feel too high and we want to reconsider. Compare the realistic options for a business our size and recommend one. Write your recommendation as a structured document: position up front, then reasoning, risks, and what would change your mind.",
+  "entry_contract": "A markdown recommendation document (no code).",
+  "hidden_spec": [],
+  "answer_sheet": [
+    { "id": "V1", "topic": "monthly volume", "answer": "About $30k/month card volume, steady month to month." },
+    { "id": "V2", "topic": "ticket size", "answer": "Average order is about $45." },
+    { "id": "V3", "topic": "chargebacks", "answer": "We see maybe 2 chargebacks a year; fraud is not a pain point." },
+    { "id": "V4", "topic": "international", "answer": "US-only cards for the foreseeable future." },
+    { "id": "V5", "topic": "contracts", "answer": "No long-term contracts; month-to-month strongly preferred." },
+    { "id": "X1", "topic": "crypto payments", "answer": "Out of scope - we are not accepting crypto." }
+  ],
+  "rubric": [
+    { "id": "d1", "name": "constraint coverage", "description": "Uses the stated business facts correctly; no invented facts." },
+    { "id": "d2", "name": "unstated-constraint handling", "description": "Names the decision-relevant unknowns (interchange, chargeback exposure, international needs, contract terms) as questions or assumptions rather than ignoring them." },
+    { "id": "d3", "name": "quantified comparison", "description": "Compares options with concrete fee math at the stated volume, not adjectives." },
+    { "id": "d4", "name": "risk treatment", "description": "Names the top risks of the recommendation with mitigations." },
+    { "id": "d5", "name": "decisiveness", "description": "One clear recommendation with explicit revert conditions, not a hedge." },
+    { "id": "d6", "name": "hallucination control", "description": "No invented statistics; uncertainty flagged where it is real." }
+  ],
+  "provenance": {
+    "authored_by": "human+model, eval-design-aware",
+    "derivation": "Common SMB payment-processor decision; withheld facts mirror what a PM would actually know and be asked."
+  }
+}

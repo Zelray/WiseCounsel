@@ -19,16 +19,17 @@
 | Debate mode (rounds 1–2) live test | ⬜ not yet exercised end-to-end |
 | Claude Code install/test | ⬜ installer supports it; not yet exercised |
 | Eval design (docs/EVAL-DESIGN.md, pre-registered: arms, grading, stats, $6 cap) | ✅ written 2026-10-01, debate-tested (skeptic/builder/architect/prior-art) |
-| Eval harness (eval/: run + judge + analyze + $0 dry-run smoke) | 🟡 scaffolded, gate checks in progress |
-| Pilot task suite (6 hidden-spec + 2 decision tasks, frozen checkers) | 🟡 authoring in progress |
-| Pilot eval run (real API spend, ≈$4.89 worst case, $6 hard cap) | ⬜ awaiting Mike's approval (gate G7) |
-| Public-repo readiness (LICENSE, CI, README Evidence, .gitignore hygiene) | 🟡 in progress |
+| Eval harness (eval/: run + judge + analyze + $0 dry-run smoke) | ✅ all gates green (G1–G6), 10 scripts parse, 32-run offline smoke passed |
+| Pilot task suite (6 hidden-spec + 2 decision tasks, frozen checkers) | ✅ 33-file SHA-256 freeze intact |
+| Pilot eval run — G7 approved by Mike | ✅ RAN 2026-10-01: 56 runs, **$0.61 total** (cap $6) — Track 1: **B−A = +15.8 pp** (CI [3.3, 35.8], p=0.125, n=6 — signal, NOT confirmed); question-overlap 21.6%; full read in docs/RESULTS.md |
+| Wave-2 confirmatory run (30 calibrated tasks, arms E+F, hardened parser) | ⬜ owner decision on ~$2–5 spend — prereg scale-gate did not fire by its letter (p=0.125 > 0.10) |
+| Public-repo readiness (LICENSE, CI, README Evidence, .gitignore hygiene) | ✅ done — badge URLs need OWNER/REPO at push |
+| Initial commit / GitHub repo | 🟡 committed on `main` (3e273b2); repo creation + push = Mike's call |
 | Engine `-OutDir` default writes inside the package (wise-counsil/runs/) | 🟡 known; gitignored (unanchored `runs/` rule); fix scheduled AFTER the eval — package is the frozen measured artifact |
 
 ## Next steps
-1. Finish eval gates (G1–G6): task cards + dry-run green.
-2. **Mike approves preregistration + pilot budget (G7)** — the money gate.
-3. Run the pilot eval (≈$1.30–2.00 expected, $4.89 worst case), publish results in docs/RESULTS.md whatever they say.
+1. **Mike decides wave 2** (~$2–5, ~2–4 h): confirmatory run with 30 calibrated tasks + sham-context & compute-matched arms.
+2. Create the GitHub repo (Mike's account) and push; fix README badge URLs.
+3. Before wave 2: harden the solution-fence parser (2 baseline runs lost to it in the pilot — disclosed in RESULTS.md); replace the ceiling Track-2 task.
 4. Exercise `debate` mode end-to-end.
 5. Build + test Door B (OpenCodeGo subagents) inside OpenCode.
-6. After 2–3 weeks of real use: decide whether the web app earns building.

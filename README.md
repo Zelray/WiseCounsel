@@ -17,26 +17,32 @@ execute it).
 
 ## Evidence
 
-WiseCounsil's improvement claim is being tested, not asserted. The full
+WiseCounsil's improvement claim is tested, not asserted. The full
 pre-registered protocol — hypotheses, arms, grading, statistics, and a hard
 budget — was committed to this repo **before** any evaluation data was
-collected: see [docs/EVAL-DESIGN.md](docs/EVAL-DESIGN.md).
+collected ([docs/EVAL-DESIGN.md](docs/EVAL-DESIGN.md)), and the pilot ran
+under it. Full numbers and caveats: [docs/RESULTS.md](docs/RESULTS.md).
 
-- **Hypothesis:** on spec-gappy coding briefs, a council-enriched pipeline
-  raises the executor's first-attempt pass rate on hidden ground-truth tests.
+**Pilot result (48 runs, $0.24, hidden-spec coding tasks):** council-enriched
+briefs improved the executor's first-attempt pass rate by a mean **+15.8
+points** (24.2% → 40.0%) at ~$0.005 extra per task — **a promising signal,
+not yet a confirmed finding** (95% CI [3.3, 35.8], p = 0.125 on 6 tasks; the
+pre-registered confirmatory bar was p < 0.05). The strongest mechanistic
+finding: the council's questions overlapped only **21.6%** with the
+questions the frontier model asked itself — differently-trained families
+really do surface different gaps. The self-questions control also improved
+(+11.7 pp), so the council's *unique* premium (+4.2 pp) is not yet
+distinguishable from noise at this scale. A null or negative wave-2 result
+will be published here exactly as a positive one would be.
+
 - **Arms:** baseline (brief alone) · council (the shipping skill) ·
   self-questions (the same executor asks its own questions — the ablation
   that isolates what the council actually adds) · single critic.
 - **Grading:** deterministic unit tests authored from hidden specs and frozen
-  before any model call — not model opinion. A blind three-judge panel scores
-  the decision-track tasks.
-- **Pilot:** 6 hidden-spec tasks + 2 decision tasks; a hard $6 spend cap.
-  The pilot's job is to prove the harness and size the confirmatory run.
-- **You can run the whole pipeline yourself right now, with zero API spend
-  and zero keys:** `pwsh -File eval/Invoke-DryRunSmoke.ps1`
-
-**Results are pending. A null or negative result will be published in
-[docs/RESULTS.md](docs/RESULTS.md) exactly as a positive one would be.**
+  before any model call — not model opinion.
+- **Reproducibility:** raw transcripts for all 56 runs ship in the repo
+  audit trail (`eval/results/`), and the whole pipeline runs offline for
+  zero dollars with `pwsh -File eval/Invoke-DryRunSmoke.ps1`.
 
 ## Why not just ask the model to think harder?
 

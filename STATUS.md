@@ -30,7 +30,8 @@
 | Engine `-OutDir` default writes inside the package (wise-counsel/runs/) | 🟡 still known; gitignored; **follow-up candidate now that the eval is done** (not in v0.2.0 scope) |
 
 ## Next steps
-1. **Track-2 judge re-run decision (Mike's go required)** — plumbing is fixed; a small (<$0.50) Track-2-only re-run would validate the panel, but it is NEW SPEND and needs a dated prereg addendum BEFORE data per HANDOFF-V02-PIVOT.
-2. Exercise `debate` mode end-to-end.
-3. Build + test Door B (OpenCodeGo subagents) inside OpenCode.
-4. Follow-up candidate: fix engine `-OutDir` default (package no longer frozen by an active measurement).
+1. **Portfolio content stream — START HERE: read `HANDOFF-2026-10-05-NEXT-STEPS.md`** (blog post → screen capture → MLO ops note → applications; four items, Mike-approved order).
+2. Track-2 judge re-run decision (Mike's go required) — plumbing is fixed; a small (<$0.50) Track-2-only re-run would validate the panel, but it is NEW SPEND and needs a dated prereg addendum BEFORE data per HANDOFF-V02-PIVOT.
+3. Exercise `debate` mode end-to-end.
+4. Build + test Door B (OpenCodeGo subagents) inside OpenCode.
+5. Follow-up candidate: fix engine `-OutDir` default (package no longer frozen by an active measurement).

@@ -28,6 +28,6 @@
 | Engine `-OutDir` default writes inside the package (wise-counsel/runs/) | 🟡 known; gitignored (unanchored `runs/` rule); fix scheduled AFTER the eval — package is the frozen measured artifact |
 
 ## Next steps
-1. **Product pivot options from the wave-2 verdict** (Mike's call): ship the question-answer scaffold with self-questions as default (council = opt-in), and/or fix Track 2's judge layer (67% null output — JSON-only instruction, larger max_tokens, structured output) and test the diversity premise on decision/research briefs where it might actually matter.
+1. **v0.2.0 pivot** — ⏭️ **START HERE in a fresh session: read `HANDOFF-V02-PIVOT.md`** (ship the clarify scaffold as default, council opt-in; Track-2 judge fix; README honesty fix; guardrails + gates skeleton included).
 2. Exercise `debate` mode end-to-end.
 3. Build + test Door B (OpenCodeGo subagents) inside OpenCode.

@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-warranty-expiry",
+  "track": 1,
+  "archetype": "date-aggregation",
+  "language": "python",
+  "public_brief": "We ship hardware with a monthly warranty and our support tooling has to know exactly when each unit's coverage ends. Implement warranty_expiry(purchase_date, months, repair_days=0). purchase_date is the day the customer bought the unit, as an ISO calendar date string (YYYY-MM-DD). months is the warranty length in calendar months. repair_days is the number of days the unit sat in our repair depot while under warranty. Work out the date coverage ends and return it as an ISO calendar date string (YYYY-MM-DD). The grader imports your module and calls the function directly with ordinary purchases and adversarial ones - odd dates, unusual month arithmetic, bad arguments - and compares return values, so every input path needs one defined answer. Keep it a pure function: no printing, no prompting, no file or network access, no clock reads.",
+  "entry_contract": "Implement warranty_expiry(purchase_date, months, repair_days=0) taking an ISO date string, an integer month count and an optional integer day count, returning an ISO date string (YYYY-MM-DD).",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Adding the warranty months keeps the purchase's day-of-month whenever that day exists in the target month (2024-01-15 + 12 months expires 2025-01-15)." },
+    { "id": "R2", "rule": "When the purchase's day-of-month does not exist in the target month, the expiry clamps to the target month's last day and never spills into the following month (2023-01-30 + 1 month expires 2023-02-28)." },
+    { "id": "R3", "rule": "A purchase made on the last day of its month is a month-end anchor: the expiry is the last day of the target month even when a same-day match would exist (2023-02-28 + 1 month expires 2023-03-31, and 2023-02-28 + 12 months expires 2024-02-29)." },
+    { "id": "R4", "rule": "February 29 counts as a month-end date, so it anchors like one (2024-02-29 + 6 months expires 2024-08-31, not 2024-08-29)." },
+    { "id": "R5", "rule": "repair_days extends coverage by that many whole days added after the month-based expiry has been computed, never before (2023-01-31 + 1 month with 1 repair day expires 2023-03-01, not 2023-03-03)." },
+    { "id": "R6", "rule": "The expiry is returned as an ISO calendar date string in YYYY-MM-DD form." },
+    { "id": "R7", "rule": "A purchase_date that is not a YYYY-MM-DD string - wrong type or wrong shape - raises ValueError; the calculator never guesses a date from bad input." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "month addition", "answer": "Straight calendar months on the same day - bought Jan 15, twelve months later it's out of warranty on Jan 15." },
+    { "id": "R2", "topic": "day clamping", "answer": "If the day isn't there in the target month, park it on that month's last day. Jan 30 plus a month is Feb 28 - we're not rolling into March." },
+    { "id": "R3", "topic": "month-end anchor", "answer": "Buy on the last day of a month and every expiry lands on a month-end too. Feb 28 plus one month is Mar 31, not Mar 28 - that's how our vendor agreements read." },
+    { "id": "R4", "topic": "leap-day purchases", "answer": "Feb 29 buyers are month-end buyers. Their expiries ride month ends as well - six months out of Feb 29 2024 ends Aug 31." },
+    { "id": "R5", "topic": "repair pause", "answer": "Depot days come off the back of the warranty: figure the date first, then add the repair days on the end. Order matters." },
+    { "id": "R6", "topic": "date format", "answer": "ISO, YYYY-MM-DD, a string. Same shape in, same shape out." },
+    { "id": "R7", "topic": "bad purchase dates", "answer": "Garbage in, ValueError out - we refuse to invent an expiry. Support would rather see the crash than a made-up date." },
+    { "id": "X1", "topic": "accidental damage", "answer": "Out of scope - accidental damage protection is a separate rider product, nothing to do with this calculator." },
+    { "id": "X2", "topic": "receipt validation", "answer": "Out of scope - we take the purchase date as given; proof-of-purchase auditing lives in the orders system." }
+  ],
+  "tests_file": "tests-24-warranty-expiry.py",
+  "reference_solution": "ref-24-warranty-expiry.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from real warranty and date-arithmetic conventions - anniversary-day month addition with end-of-month clamping, finance-style month-end anchoring, consumer-protection repair-day extensions - not from any WiseCounsil design document."
+  }
+}

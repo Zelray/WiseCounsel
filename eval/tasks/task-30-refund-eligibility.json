@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-refund-eligibility",
+  "track": 1,
+  "archetype": "mixed",
+  "language": "python",
+  "public_brief": "Our returns desk needs one function it can trust: refund_eligibility(category, days_since_delivery, condition). category is the product category string, days_since_delivery is an integer count of days since the carrier marked the order delivered (negative means it has not arrived yet), and condition is the customer-reported state of the item. The function hands back exactly one verdict string: 'full', 'partial', or 'denied'. Two input conventions are fixed and published: the only recognized conditions are 'new', 'opened', and 'defective', and anything else raises ValueError - that validation runs before any policy door, so even a final-sale category or an undelivered order with a bogus condition gets the exception, not a verdict; and an unrecognized category is never an error - it simply falls back to the standard treatment. Years of return policy have layered the rest on top of that shape - windows that vary by what was bought, states that grade a verdict down, a few hard doors that shut everything out - and I am deliberately not listing them in this ticket; the grader knows current policy and calls the function directly with everyday returns and deliberately nasty edge cases, comparing the verdict string that comes back. Keep it a pure function apart from that one validation raise: no printing, no prompting, no file or network access, and every other input gets a defined answer.",
+  "entry_contract": "Implement refund_eligibility(category, days_since_delivery, condition) taking three positional arguments and returning one of the exact strings 'full', 'partial', or 'denied'; an unrecognized condition string raises ValueError before any policy is applied, while an unrecognized category is answered with the standard treatment rather than an error.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "The standard return window is 30 days from delivery, counted inclusively: day 30 still earns a verdict from the window rules, day 31 is denied." },
+    { "id": "R2", "rule": "Category-specific windows override the standard: electronics shorten to 15 days and perishables to 7, while any category not on that list (known or unknown) uses the standard 30." },
+    { "id": "R3", "rule": "Within the window, condition 'new' earns 'full' while condition 'opened' grades down to 'partial'; being opened never extends the window." },
+    { "id": "R4", "rule": "A negative days_since_delivery means the order was never delivered and is 'denied' outright, even for defective items; day 0 counts as delivered and is judged normally." },
+    { "id": "R5", "rule": "Condition 'defective' earns 'full' up to 90 days after delivery inclusive, overriding the category window, and 'denied' past day 90." },
+    { "id": "R6", "rule": "Anything in the clearance category is 'denied' regardless of condition or timing - final sale stays final even for defective items." },
+    { "id": "R7", "rule": "Any condition string other than 'new', 'opened', or 'defective' raises ValueError, and that validation runs before every other rule, including the clearance and delivery checks; an unrecognized category never raises - it takes the standard-window treatment (both error-path conventions are published in the ticket)." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "standard window", "answer": "Thirty days from delivery, and the thirtieth day itself still counts. Thirty-one is too late." },
+    { "id": "R2", "topic": "category windows", "answer": "Electronics tighten to fifteen days and perishables to seven. Anything we didn't name - even a category we've never heard of - falls back to the standard thirty." },
+    { "id": "R3", "topic": "condition grading", "answer": "Inside the window, new is a full refund and opened grades down to partial. And no, opening the box doesn't buy you extra days." },
+    { "id": "R4", "topic": "delivery first", "answer": "Nothing refunds before it has arrived: negative day counts are denied even when the unit is defective. Day zero counts as delivered." },
+    { "id": "R5", "topic": "defective exception", "answer": "Defective units ride outside the category window - full refund any time up to ninety days inclusive, and denied once past ninety." },
+    { "id": "R6", "topic": "final sale", "answer": "Clearance is final sale. Denied come what may - defects included, that's the deal with clearance pricing." },
+    { "id": "R7", "topic": "condition validation", "answer": "The only recognized states are new, opened, and defective. Anything else raises ValueError, and we validate before every other rule - even final sale doesn't get to answer first." },
+    { "id": "X1", "topic": "refund amounts", "answer": "Out of scope - this returns a verdict only; the amount engine computes dollars somewhere else." },
+    { "id": "X2", "topic": "return shipping", "answer": "Out of scope - no labels or logistics here; that belongs to fulfillment." }
+  ],
+  "tests_file": "tests-30-refund-eligibility.py",
+  "reference_solution": "ref-30-refund-eligibility.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream retail return-policy conventions (30-day standard windows with category-specific exceptions, opened-vs-new condition grading, delivered-before-return prerequisite, 90-day defect coverage, final-sale exclusions, strict enum validation), not from any WiseCounsil design document. Round-3 calibration revision (2026-10-05): no conventions moved into or out of the brief - the two error-path conventions (strict condition enum raised before every policy door, unknown category answered with the standard treatment rather than an error) were already the published surface - and the hidden rules are unchanged; the tests were de-coupled instead, holding the condition-grading probe to a day every plausible window contains and moving the opened-does-not-extend probe to a day past every plausible window, so a wrong window guess now costs only the window tests instead of cascading through grading, delivery, and defect rules."
+  }
+}

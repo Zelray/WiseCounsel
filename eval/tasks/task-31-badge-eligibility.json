@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-badge-eligibility",
+  "track": 1,
+  "archetype": "mixed",
+  "language": "python",
+  "public_brief": "Our front desk keeps fielding 'why didn't my badge open the door' tickets, so I want one function the security panel can call: badge_access(role, zone, weekday, hour). role is the badge-holder class - one of 'employee', 'contractor', 'senior', or 'admin'; zone is the door's zone name ('general', 'lab', or 'server'); weekday is the English day name as a string; and hour is the 24-hour clock hour as an integer. It returns True when the badge opens that door at that moment and False when it does not. The access matrix has years of unwritten convention baked in - who opens what, at which hours, on which days - and I won't paste the whole matrix into a ticket; the grader knows the real policy and calls the function directly with ordinary shifts and hostile edge cases, comparing the boolean. Keep it a pure function: no printing, no I/O, and every input needs a defined answer.",
+  "entry_contract": "Implement badge_access(role, zone, weekday, hour) taking four positional arguments and returning a strict bool (True when the door opens, False otherwise).",
+  "hidden_spec": [
+    { "id": "R1", "rule": "The check fails closed: any role or zone outside the known sets, any weekday that is not one of the seven English day names, or any hour outside 0-23 returns False and never raises; day names match case-insensitively while role and zone are exact lowercase matches." },
+    { "id": "R2", "rule": "Employees open general-zone doors on weekdays only when the hour is 6 through 19 inclusive - 6:00 is the first working minute and 20:00 is already locked." },
+    { "id": "R3", "rule": "Contractors are capped tighter: weekdays only, hours 8 through 17 inclusive, and the general zone only - the lab and server zones never open for them at any hour." },
+    { "id": "R4", "rule": "The lab zone admits only the senior and admin roles regardless of hour, and the server zone admits only the admin role, ever." },
+    { "id": "R5", "rule": "The admin role returns True for every zone on every day at every hour, weekends and 3 AM included." },
+    { "id": "R6", "rule": "On Saturday or Sunday the employee and contractor roles are denied everywhere, even at hours that would pass inside their weekday windows." },
+    { "id": "R7", "rule": "The senior role badges into the general and lab zones around the clock on any day of the week, but never into the server zone." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "fail closed", "answer": "Anything we don't recognize - a role, a zone, a misspelled day, an hour outside 0-23 - comes back False. Security fails closed and never throws. Day names ignore case; roles and zones do not." },
+    { "id": "R2", "topic": "employee window", "answer": "Employees open general doors on weekdays from 6:00 to 19:59. Six sharp is the first minute that works; 20:00 shuts the door." },
+    { "id": "R3", "topic": "contractor cap", "answer": "Contractors get a tighter leash: weekdays, 8:00 through 17:59, general zone only. The lab and the server room never open for them." },
+    { "id": "R4", "topic": "zone tiers", "answer": "Lab doors only answer to senior and admin. Server room answers to admin alone - nobody else, any hour, any day." },
+    { "id": "R5", "topic": "admin everywhere", "answer": "Admin badges are master keys: every zone, every day, 3 AM included." },
+    { "id": "R6", "topic": "weekend lockout", "answer": "Saturdays and Sundays the building locks down for employees and contractors - their weekday hours don't carry over." },
+    { "id": "R7", "topic": "senior anytime", "answer": "Senior staff badge into general and lab around the clock, weekends included. The server room is still admin-only." },
+    { "id": "X1", "topic": "visitor escorting", "answer": "Out of scope - escort handling lives at the front desk, not in this function." },
+    { "id": "X2", "topic": "badge revocation", "answer": "Out of scope - no revoked-list or lost-badge logic here; the credential service owns that." }
+  ],
+  "tests_file": "tests-31-badge-eligibility.py",
+  "reference_solution": "ref-31-badge-eligibility.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream office physical-security conventions (tiered zone access, business-hours windows by badge class, tighter contractor caps, 24/7 admin master keys, weekend lockdowns, fail-closed handling of unrecognized input), not from any WiseCounsil design document."
+  }
+}

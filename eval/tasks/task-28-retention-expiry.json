@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-retention-expiry",
+  "track": 1,
+  "archetype": "date-aggregation",
+  "language": "python",
+  "public_brief": "Records management decides when each stored record may finally be destroyed. Implement retention_expiry(created_date, category, legal_hold=False). created_date is the day the record entered the archive, ISO (YYYY-MM-DD). category is one of our retention classes: 'logs', 'backups', 'customer' or 'financial' - each class carries its own retention period, so the class alone determines how long a record lives. legal_hold flags a record our lawyers have frozen: a frozen record may never be destroyed, and for one of those you return None instead of a date. For every other record, return the earliest destruction date as a plain ISO date string (YYYY-MM-DD) - never a datetime.date object, never a dict, never an error string. Bad input fails loudly: raise ValueError when created_date is not a YYYY-MM-DD string (non-strings included) and when category is not one of the four classes. The grader imports your module and calls the function directly with ordinary records and adversarial ones and compares return values and raised exceptions, so every input path needs one defined answer. Keep it a pure function: no printing, no file or network access, no clock reads.",
+  "entry_contract": "Implement retention_expiry(created_date, category, legal_hold=False) taking an ISO date string, a string category and an optional bool, returning an ISO date string (YYYY-MM-DD) for destroyable records or None for frozen ones; raise ValueError for a created_date that is not a YYYY-MM-DD string or a category outside the four classes.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Category 'logs' keeps for 90 days: expiry is created_date + 90 days." },
+    { "id": "R2", "rule": "Category 'backups' keeps for 365 days: expiry is created_date + 365 days." },
+    { "id": "R3", "rule": "Category 'customer' keeps for 1095 days: expiry is created_date + 1095 days." },
+    { "id": "R4", "rule": "Category 'financial' keeps for 2555 days: expiry is created_date + 2555 days - a flat day count, so leap days are not inserted (2020-01-15 expires 2027-01-13, not 2027-01-15)." },
+    { "id": "R5", "rule": "When legal_hold is True the record may never be destroyed and the function returns None, whatever the category." },
+    { "id": "R6", "rule": "If the computed expiry lands on a Saturday or a Sunday it rolls forward to the following Monday (destruction only happens on business days)." },
+    { "id": "R7", "rule": "An unknown category raises ValueError - and category validation happens before a legal hold is honoured, so it raises even when legal_hold is True." },
+    { "id": "R8", "rule": "A created_date that is not a YYYY-MM-DD string raises ValueError." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "logs TTL", "answer": "Logs live 90 days, no more - they're bulky and we only ever debug with the recent ones." },
+    { "id": "R2", "topic": "backups TTL", "answer": "Backups roll off after 365 days. A year of restore points, then they're gone." },
+    { "id": "R3", "topic": "customer TTL", "answer": "Customer records keep three years - 1095 days, flat." },
+    { "id": "R4", "topic": "financial TTL", "answer": "Financial records are the seven-year class - 2555 days as a plain day count. We don't stretch it for leap years; the clock is flat days." },
+    { "id": "R5", "topic": "legal hold", "answer": "If legal has their hands on it, it never expires - None, indefinitely. Holds beat every TTL." },
+    { "id": "R6", "topic": "weekend rollover", "answer": "Destruction jobs only run on business days. An expiry landing Saturday or Sunday slides to Monday - we never destroy on a weekend." },
+    { "id": "R7", "topic": "unknown category", "answer": "A category we don't recognize raises ValueError before anything else - even a legal hold doesn't save it. Silent forever-records are how audits go bad." },
+    { "id": "R8", "topic": "bad dates", "answer": "A created_date that won't parse raises ValueError. We don't guess when a record was born." },
+    { "id": "X1", "topic": "backup encryption", "answer": "Out of scope - encryption-at-rest choices belong to the storage team, not the retention calculator." },
+    { "id": "X2", "topic": "deletion mechanics", "answer": "Out of scope - this only computes the eligible date; the purge job's retries and scheduling live elsewhere." }
+  ],
+  "tests_file": "tests-28-retention-expiry.py",
+  "reference_solution": "ref-28-retention-expiry.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from records-retention practice - per-class TTLs, legal holds suspending destruction, business-day-only destruction with Monday rollover - not from any WiseCounsil design document. Revision 2 (2026-10-05): after a 0/10 calibration baseline, the return-shape and error-path conventions (plain ISO string return, None on legal hold, ValueError on a malformed created_date or an unknown category) were moved from the hidden spec into the public brief and entry_contract, while the quantitative rules (per-class TTL day counts, flat-day leap handling, weekend rollover direction, validation-before-hold ordering) stay hidden."
+  }
+}

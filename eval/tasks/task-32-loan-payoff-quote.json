@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-loan-payoff-quote",
+  "track": 1,
+  "archetype": "mixed",
+  "language": "python",
+  "public_brief": "When a borrower asks 'what do I owe to clear this today,' the loan system has to answer with one number, and the auditors get twitchy when it's the wrong one. Implement payoff_quote(balance, annual_rate, days_accrued, late_fee): balance is the outstanding principal in dollars, annual_rate is the loan's yearly rate expressed in percent - 12 means 12% a year, not 0.12 - days_accrued is how many days have passed since the last payment posted, and late_fee is the scheduled fee in dollars. It returns the payoff as a float - one number of dollars like 1042.37, never an integer cent count. A few input conventions are fixed and published so nobody has to guess them: a balance of zero or less quotes 0.0 no matter what rate, days, or fee came in - we never quote a negative payoff; and zero days accrued adds no interest at all. The amortization desk has house conventions for the per-day interest math, when a fee actually attaches, how much of it sticks, and how the pieces sum - I'm not writing all of that down in a ticket; the grader knows the real policy and will call the function directly with routine quotes and adversarial ones, comparing the number. Keep it a pure function: no printing, no I/O, and every input needs a defined answer.",
+  "entry_contract": "Implement payoff_quote(balance, annual_rate, days_accrued, late_fee) taking four positional numbers and returning the payoff as a float (dollars, never an integer cent count); annual_rate arrives in percent (12 means 12% a year), and a balance of zero or less quotes 0.0.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Per-diem interest uses a 365-day year: one day's interest is balance times annual_rate divided by 100 and then by 365 - the 360-day banker's year is never used. (Zero days accrued adds nothing is published in the ticket; the 365 basis itself is not.)" },
+    { "id": "R2", "rule": "The late fee posts before interest accrues, so the daily interest base is balance plus the effective fee; interest itself never compounds on interest." },
+    { "id": "R3", "rule": "The late fee attaches only when days_accrued exceeds 10 - a ten-day grace period; on day 10 or sooner no fee is owed at all." },
+    { "id": "R4", "rule": "When it does attach, the fee is capped at 5% of the balance, inclusive: the applied fee is min(late_fee, 0.05 times balance)." },
+    { "id": "R5", "rule": "The quoted payoff is rounded to the nearest cent with half cents rounding up (half away from zero)." },
+    { "id": "R6", "rule": "A balance of zero or less returns 0.0 no matter what rate, days, or fee are passed, and the function never returns a negative payoff (this error-path convention is published in the ticket)." },
+    { "id": "R7", "rule": "annual_rate is expressed in percent - 12 means 12% annual, so 0.05 would mean five-hundredths of one percent, not five percent (this unit convention is published in the ticket)." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "per-diem basis", "answer": "Interest accrues at annual over 365 per day - actual days against a real 365-day year, none of that 360-day banker stuff. Day zero accrues nothing." },
+    { "id": "R2", "topic": "posting order", "answer": "The fee posts first, then interest runs - so the fee rides in the interest-bearing base for the whole period. Interest never compounds on itself." },
+    { "id": "R3", "topic": "fee grace", "answer": "No late fee until day eleven - there's a ten-day grace. On day ten or sooner the fee simply isn't there." },
+    { "id": "R4", "topic": "fee cap", "answer": "Whatever the schedule says, the late fee never exceeds five percent of the balance. If the scheduled fee is smaller, we take the fee." },
+    { "id": "R5", "topic": "rounding", "answer": "The quote comes back to the penny and half cents round up. One number, exact cents." },
+    { "id": "R6", "topic": "dead accounts", "answer": "Balance of zero or less? Quote is 0.0, full stop - we never quote a negative payoff, and fees don't resurrect a dead account." },
+    { "id": "R7", "topic": "rate units", "answer": "Rates arrive in percent - 12 means twelve percent a year. Nobody hands us decimals-of-one here." },
+    { "id": "X1", "topic": "escrow", "answer": "Out of scope - escrow buckets live on a different statement; this quote is principal, fee, and interest only." },
+    { "id": "X2", "topic": "prepayment penalty", "answer": "Out of scope - no prepayment-penalty logic here; our loans don't carry one." }
+  ],
+  "tests_file": "tests-32-loan-payoff-quote.py",
+  "reference_solution": "ref-32-loan-payoff-quote.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream consumer-lending conventions (actual/365 per-diem interest, fees posting ahead of interest so they enter the accrual base, grace periods before late fees, percentage caps on fees, cent rounding, percent-denominated rates), not from any WiseCounsil design document. Round-3 calibration revision (2026-10-05): the return shape (float dollars, never an integer cent count), the rate-unit convention (percent, not decimals-of-one), the non-positive-balance error path (quote 0.0, never a negative payoff), and the zero-days-accrues-nothing degenerate case moved into the public brief and entry contract, while the day-count basis, fee posting order, grace length, cap percent, and rounding mode stay hidden; the tests were re-anchored so the posting-order probe carries a fee far under the cap at a day count past any plausible grace, the cap probe runs at a zero rate where no interest convention can leak into it, and the rounding probe lands on a true half cent - a wrong guess on one hidden convention now costs mostly its own rule's tests."
+  }
+}

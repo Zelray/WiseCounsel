@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-license-plate",
+  "track": 1,
+  "archetype": "input-validation",
+  "language": "python",
+  "public_brief": "We run the vehicle-services portal for a mid-sized state, and every customer form starts with the plate field. Implement is_valid_plate(plate), which takes the plate exactly as the customer typed it and answers one question: could the state have issued this as a passenger plate? Return True when the string matches one of our issuing patterns and False when a clerk would bounce it. The state has run more than one serial style over the decades, and certain letters and two-letter openings are set aside for other plate programs, so the validator has to know all of that. The error posture is fixed and public: the validator never raises - None, a number, a list, bytes, any non-string argument simply returns False - and the value is judged exactly as typed, with leading and trailing whitespace never trimmed, so padded input is False. Keep it a pure function: no printing, no prompting, no filesystem or network access. Graders call it directly with ordinary plates and with messy values - padded text, wrong shapes, odd types - and compare return values, so every input path needs a defined answer.",
+  "entry_contract": "Implement is_valid_plate(plate) taking one positional argument of any type and returning a strict bool (True or False) for every input. Never raise: a non-str argument returns False, and the string is judged exactly as typed - leading or trailing whitespace is never trimmed.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "A plate is either the modern series - exactly three letters followed by four digits, seven characters - or nothing else; hyphens, spaces, and other separators never appear inside a serial." },
+    { "id": "R2", "rule": "The letters I, O, and Q are never issued in any letter position because they read as 1 and 0 on stamped metal, so seeing one anywhere in the plate makes it False." },
+    { "id": "R3", "rule": "The two-letter openings DP and CX are reserved for the disabled-veteran and commercial-fleet programs, so any plate beginning with either pair is not a passenger plate and is False." },
+    { "id": "R4", "rule": "Plates from before the 1987 redesign - the vintage series - are exactly two letters followed by four digits and are still legal, so that shape is accepted, while one letter plus five digits or two letters plus three digits never existed and are False." },
+    { "id": "R5", "rule": "Plates are judged as embossed: every letter is uppercase, so any lowercase letter anywhere makes the plate False." },
+    { "id": "R6", "rule": "The plate is judged exactly as typed; leading or trailing whitespace is never trimmed and makes it False. (Input-hygiene posture stated in the public brief.)" },
+    { "id": "R7", "rule": "Any argument that is not a str returns False and never raises. (Error posture stated in the public brief and entry_contract.)" }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "serial shape", "answer": "The current run is three letters then four digits, seven characters, stamped solid - no hyphen, no space, nothing. The stamp has no room for separators." },
+    { "id": "R2", "topic": "excluded letters", "answer": "We never strike I, O, or Q in any position - they read as 1 and 0 on a plate at a glance. One of those anywhere is an instant no." },
+    { "id": "R3", "topic": "reserved prefixes", "answer": "DP and CX open the disabled-veteran and commercial-fleet series. Anything starting with those two pairs is another program's plate, so reject it even when the shape looks right." },
+    { "id": "R4", "topic": "vintage series", "answer": "Before the 1987 redesign we issued two letters plus four digits, and those are still legal to display, so take them. One letter plus five digits was never a thing here, and two letters plus three digits is a truncated stamp." },
+    { "id": "R5", "topic": "letter case", "answer": "Plates come off the press in caps. Lowercase anywhere means somebody retyped it rather than issued it." },
+    { "id": "R6", "topic": "whitespace", "answer": "Judge the field exactly as typed. If it arrives padded with spaces, that is a fail - we do not tidy up for the customer. (Stated in the public brief, so it is a free rule for anyone who reads.)" },
+    { "id": "R7", "topic": "bad input type", "answer": "Anything that is not text comes back False. Same posture as the username task: we answer, we never throw. (Stated in the public brief and entry_contract.)" },
+    { "id": "X1", "topic": "registration status", "answer": "Out of scope - this is a shape check on the string. Whether the plate is registered, expired, or suspended lives in the vehicle registry, not here." },
+    { "id": "X2", "topic": "vanity plates", "answer": "Out of scope - personalized plate orders go through a separate review queue with their own character rules." }
+  ],
+  "tests_file": "tests-14-license-plate.py",
+  "reference_solution": "ref-14-license-plate.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from US state DMV plate conventions (fixed letter-plus-digit serial shapes, confusable-letter bans on I/O/Q, reserved prefix series for special plate programs, pre-redesign serials kept as a vintage series, uppercase embossing, no-trim input hygiene, boolean-gate error posture), not from any WiseCounsil design document. Revision 2026-10-05 after difficulty calibration (round-1 baseline 20%): the never-raise/non-string-False error posture and the no-trim input-hygiene rule were moved into the public brief and entry_contract, and the confusable-letter and reserved-prefix conventions were de-coupled into paired reject/accept tests that no longer depend on the vintage series, so a solid implementation that guesses wrong on the still-hidden conventions lands in the 30-70% band."
+  }
+}

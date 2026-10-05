@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-recurrence-clip",
+  "track": 1,
+  "archetype": "date-aggregation",
+  "language": "python",
+  "public_brief": "Our calendar backend stores a weekly meeting as a series and needs it clipped to a reporting window. Implement recurrence_clip(start_date, count, window_start, window_end). start_date pins where the series' weekly cycle sits, the series runs for exactly count occurrences, and window_start and window_end bound the reporting window. All date arguments are ISO date strings (YYYY-MM-DD) and count is an integer. Return the list of occurrence dates that fall inside the window, each as an ISO date string (YYYY-MM-DD). The grader imports your module and calls the function directly and compares return values exactly, so every input path needs one defined answer. Keep it a pure function: no printing, no file or network access, no clock reads.",
+  "entry_contract": "Implement recurrence_clip(start_date, count, window_start, window_end) taking three ISO date strings and an integer count, returning a list of ISO date strings (YYYY-MM-DD).",
+  "hidden_spec": [
+    { "id": "R1", "rule": "The anchor date itself is the series' first occurrence (occurrence k starts at k = 0)." },
+    { "id": "R2", "rule": "Occurrences repeat every 7 days exactly, so occurrence k falls on start_date + 7k days." },
+    { "id": "R3", "rule": "The series has exactly count occurrences: occurrence k exists only for k < count, so a count of 0 or less yields no occurrences at all." },
+    { "id": "R4", "rule": "The reporting window is half-open: window_start is included, window_end is excluded - an occurrence that lands exactly on window_end belongs to the next window, not this one." },
+    { "id": "R5", "rule": "The returned dates are in ascending chronological order." },
+    { "id": "R6", "rule": "A window containing no occurrences returns an empty list, never None and never an error." },
+    { "id": "R7", "rule": "A window whose end is before its start is simply empty - no occurrence can fall inside it." },
+    { "id": "R8", "rule": "Any date argument that is not a YYYY-MM-DD string raises ValueError." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "anchor counts", "answer": "The first meeting happens on the anchor date itself - it's occurrence one, not a preview." },
+    { "id": "R2", "topic": "weekly cadence", "answer": "Every seven days, on the nose. Same weekday forever." },
+    { "id": "R3", "topic": "series length", "answer": "The series is count meetings long. When it's done, it's done - nothing past the last one even if the window keeps going." },
+    { "id": "R4", "topic": "window edges", "answer": "Half-open window: the first day counts, the boundary day doesn't. Adjacent windows share a seam - if both claimed the day sitting on it, every meeting on a seam would be double-counted." },
+    { "id": "R5", "topic": "ordering", "answer": "Oldest first, always - the panel draws top-down." },
+    { "id": "R6", "topic": "quiet windows", "answer": "Nothing in the window? Empty list. The calendar panel just renders nothing." },
+    { "id": "R7", "topic": "backwards window", "answer": "An end before a start is an empty window, not a crash - clipping a reversed range clips to nothing." },
+    { "id": "R8", "topic": "bad dates", "answer": "Dates that won't parse raise ValueError. Better a loud failure than a meeting silently dropped from someone's calendar." },
+    { "id": "X1", "topic": "attendee scheduling", "answer": "Out of scope - invitees, rooms and conflicts live in the scheduling service." },
+    { "id": "X2", "topic": "recurrence edits", "answer": "Out of scope - editing or cancelling a single occurrence is a write-path feature; this only reads the series." }
+  ],
+  "tests_file": "tests-27-recurrence-clip.py",
+  "reference_solution": "ref-27-recurrence-clip.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from calendar-recurrence conventions - anchored series where the start date is the first occurrence, fixed 7-day cadence, capped occurrence counts, closed clipping windows - not from any WiseCounsil design document. Revision 2 (2026-10-05): after a 9/10 calibration baseline, the adversarial-input enumeration ('windows that graze the series', 'counts of zero', 'malformed arguments') and the 'anchor of the series' phrasing were removed from the public brief, and the window convention was pinned to the standard half-open reporting window (start included, end excluded, per calendar DTEND/interval practice) so edge behavior is a genuine convention call rather than the naive inclusive default."
+  }
+}

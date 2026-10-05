@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-turnstile-gate",
+  "track": 1,
+  "archetype": "state-machine",
+  "language": "python",
+  "public_brief": "We're speccing the fare-gate controller for the transit retrofit. Implement turnstile_step(state, event, idle_seconds=0) as a pure reducer that returns the gate's next state string. The gate sits in one of two states, locked or unlocked. Events are the strings coin (a cash fare), swipe (a farecard read), push (someone pushes the arm), and timeout (the controller's periodic tick). idle_seconds is how long the gate has been sitting untouched since its last event - it only matters for the tick. Graders call the function directly with ordinary entries and with adversarial sequences - every event fired in every state, oddly cased event names, unknown states and events, and idle_seconds values both small and large - and compare return values, so every combination needs a defined answer. Keep it pure: no printing, no I/O, no exceptions.",
+  "entry_contract": "Implement turnstile_step(state, event, idle_seconds=0) taking two string arguments and an int second count (default 0), and returning a plain state string for every input combination.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "coin from locked buys exactly one entry: the gate returns unlocked." },
+    { "id": "R2", "rule": "swipe from locked buys exactly one entry: the gate returns unlocked." },
+    { "id": "R3", "rule": "push from unlocked is a person passing through: the entry is consumed and the gate returns locked." },
+    { "id": "R4", "rule": "push from locked does nothing: the arm stays locked and no entry is granted." },
+    { "id": "R5", "rule": "coin or swipe while the gate is already unlocked is ignored - it returns unlocked unchanged, because the gate will not take a second fare for the same entry." },
+    { "id": "R6", "rule": "timeout relocks an unattended gate: from unlocked it returns locked once idle_seconds is 30 or more and stays unlocked below that; from locked it is a no-op returning locked." },
+    { "id": "R7", "rule": "Event names match exactly and case-sensitively: SWIPE, Swipe, or Coin is not a coin or swipe and falls through to the unknown-event behavior." },
+    { "id": "R8", "rule": "Any unknown state or unknown event returns the input state unchanged and never raises." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "coin entry", "answer": "A coin on a locked gate buys exactly one entry - it opens: unlocked." },
+    { "id": "R2", "topic": "swipe entry", "answer": "Same deal for a farecard - a swipe on locked opens the gate: unlocked." },
+    { "id": "R3", "topic": "pass-through", "answer": "Push while unlocked is somebody walking through. The entry is spent and the arm relocks: locked." },
+    { "id": "R4", "topic": "forced arm", "answer": "Pushing a locked arm does nothing - it stays locked. Nobody rattles their way into a free ride." },
+    { "id": "R5", "topic": "second fare", "answer": "A coin or swipe while the gate is already unlocked is ignored - it stays unlocked. We don't sell two rides for one entry, and we don't error either." },
+    { "id": "R6", "topic": "auto-relock", "answer": "An unlocked gate nobody pushes relocks after 30 seconds - at 30 or more the timeout ticks it locked, under 30 it keeps waiting. A timeout on an already-locked gate is just a no-op." },
+    { "id": "R7", "topic": "exact names", "answer": "Events match exactly and case-sensitively - SWIPE and Coin are just noise as far as the controller cares." },
+    { "id": "R8", "topic": "unmapped inputs", "answer": "Anything unknown - state or event - hands back the state unchanged, never an exception." },
+    { "id": "X1", "topic": "fare pricing", "answer": "Out of scope - fares, transfers, and passes live in the fare table, not the gate controller." },
+    { "id": "X2", "topic": "emergency gates", "answer": "Out of scope - ADA and emergency gates are separate hardware with their own rules." }
+  ],
+  "tests_file": "tests-21-turnstile-gate.py",
+  "reference_solution": "ref-21-turnstile-gate.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from real fare-gate conventions (one fare buys one entry, payment unlocks, passage relocks, no second fare accepted for an open gate, an unattended gate auto-relocks on a fixed timeout, case-sensitive control signals), not from any WiseCounsil design document."
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-subscription-lifecycle",
+  "track": 1,
+  "archetype": "state-machine",
+  "language": "python",
+  "public_brief": "The billing service needs its subscription lifecycle pinned down before we wire up the dunning vendor. Implement advance_subscription(state, event, days_in_state=0) as a pure reducer: given the current state string - one of trial, active, past_due, canceled, expired - and an event string - one of convert, payment_failed, payment_succeeded, cancel, reactivate - return the state string the subscription is in afterwards. days_in_state is the number of whole days the subscription has been sitting in its current state, defaulting to 0. Graders call the function directly with ordinary lifecycles and with adversarial ones - pairings the flow charts never drew, unknown state names, unknown events, and day counts both small and large - and compare return values, so every combination needs a defined answer. No printing, no I/O, no exceptions.",
+  "entry_contract": "Implement advance_subscription(state, event, days_in_state=0) taking two string arguments and an int day count (default 0), and returning a plain state string for every input combination.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "trial + convert moves the subscription to active; converting a trial starts the paid subscription and no payment event is needed first." },
+    { "id": "R2", "rule": "cancel from trial or active lands on canceled - never expired - because cancellation is a user choice that takes effect immediately." },
+    { "id": "R3", "rule": "active + payment_failed moves the subscription to past_due; a failed charge starts the dunning window and never cancels the subscription directly." },
+    { "id": "R4", "rule": "past_due + payment_succeeded returns active while days_in_state is at most 30 (the grace window, inclusive); on day 31 or later the account has already lapsed and the same event returns expired." },
+    { "id": "R5", "rule": "past_due + payment_failed returns past_due while days_in_state is at most 30, and expired once days_in_state exceeds 30 - retries inside the window are harmless, after it the dunning has run out." },
+    { "id": "R6", "rule": "canceled + reactivate returns active only within a 14-day window (days_in_state at most 14, inclusive); from day 15 on the record has lapsed and reactivation returns expired." },
+    { "id": "R7", "rule": "expired is terminal: every event on expired returns expired and nothing revives it." },
+    { "id": "R8", "rule": "Any state and event pairing not listed above returns the input state unchanged and never raises - including unknown state names, unknown event names, and reactivate from any state other than canceled." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "trial conversion", "answer": "Convert is the only door from trial to active - no payment event needed first, the billing vendor grabs the first charge out-of-band. Works on day 0 or day 40, the day count doesn't gate it." },
+    { "id": "R2", "topic": "cancellation", "answer": "Cancel from trial or from active both land on canceled - never expired. Canceled is a choice the customer made; expired is what the system does when it gives up on you." },
+    { "id": "R3", "topic": "dunning entry", "answer": "A failed charge on active drops it to past_due. We never cancel straight off one failed card - dunning always gets its window first." },
+    { "id": "R4", "topic": "grace recovery", "answer": "Past-due accounts get 30 days of grace, day 30 included: a successful payment in that window flips them back to active. Come day 31 the account has already lapsed, so the very same payment reports expired." },
+    { "id": "R5", "topic": "retry behavior", "answer": "Failed retries inside the 30-day window just keep the account past_due - no penalty. Once the window is blown, day 31 onward, a retry reports expired instead." },
+    { "id": "R6", "topic": "reactivation", "answer": "Canceled subs can come back: reactivate puts them straight to active, but only for 14 days - day 14 still works. Day 15 onward the record has lapsed and reactivating hands back expired." },
+    { "id": "R7", "topic": "expired terminal", "answer": "Expired is a dead end - nothing revives it. Every event you throw at expired returns expired." },
+    { "id": "R8", "topic": "unmapped pairs", "answer": "Anything we didn't explicitly map returns the state you came in with - unknown states, unknown events, reactivate on a live sub, cancelling a past-due account, all of it. No exceptions, ever." },
+    { "id": "X1", "topic": "pricing and proration", "answer": "Out of scope - this reducer moves states; plan prices, proration, and invoice amounts live in the billing engine." },
+    { "id": "X2", "topic": "dunning emails", "answer": "Out of scope - email cadence belongs to the notifications team; this function only tracks state." }
+  ],
+  "tests_file": "tests-19-subscription-lifecycle.py",
+  "reference_solution": "ref-19-subscription-lifecycle.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream SaaS billing conventions (trial-to-paid conversion, dunning past-due states after failed charges, a fixed inclusive grace window before lapse, a shorter bounded reactivation window for cancellations, a terminal lapsed state, ignored unmapped events), not from any WiseCounsil design document."
+  }
+}

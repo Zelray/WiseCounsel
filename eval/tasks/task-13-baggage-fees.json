@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-baggage-fees",
+  "track": 1,
+  "archetype": "domain-rule-calculator",
+  "language": "python",
+  "public_brief": "The airline's digital counter needs its bag-charge table as code. Implement baggage_fees(carry_ons, checked, heaviest_kg, tier, prepaid), which prices one passenger's luggage: how many carry-on bags they are bringing, how many bags they are checking, the weight in kilograms of their heaviest checked bag, their frequent-flyer tier as a string, and whether they paid for the bags online before the airport. It returns the total bag charges in dollars as a float, applying the published part of the schedule the way the counter agent reads it out: the first carry-on rides free and a second carry-on costs a flat 35.00, and the counter never prices more than two carry-ons for one passenger; checked bags ride an escalator, the first at 40.00, the second at 55.00, and every checked bag beyond the second at 90.00; status tiers none, silver, and gold carry perks against the checked-bag side of the schedule, matched the way the loyalty desk matches tier names; and paying online before the airport earns the prepay break on part of the schedule. Weight consequences, the exact shape of the tier perks, and the exact prepay break live in the counter's back-room rulebook - apply them as written there. A request that cannot be priced returns exactly -1.0: the kiosk never crashes, never raises, and never returns None - it just says no. Keep it a pure function: no printing, no files, no network. Graders call it directly with ordinary passengers and adversarial ones - boundary weights, odd counts, wrong types - and compare the returned float, so every input path needs one defined answer.",
+  "entry_contract": "Implement baggage_fees(carry_ons, checked, heaviest_kg, tier, prepaid) taking five positional arguments - carry_ons (int), checked (int), heaviest_kg (number), tier (string), prepaid (bool) - and returning a float dollar amount for every input, with -1.0 as the defined cannot-price value in place of any exception.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "The first carry-on is free and a second carry-on costs a flat 35.00; loyalty tier never changes carry-on charges." },
+    { "id": "R2", "rule": "Checked bags are priced on an escalator: 40.00 for the first bag, 55.00 for the second, and 90.00 for every bag beyond the second." },
+    { "id": "R3", "rule": "If the heaviest checked bag weighs more than 23 kg, a flat 75.00 overweight fee is added once; a bag weighing exactly 23 kg draws no fee." },
+    { "id": "R4", "rule": "A heaviest checked bag over 32 kg is refused outright: the function returns -1.0 for the whole request, while exactly 32 kg is still accepted and charged." },
+    { "id": "R5", "rule": "Tier is matched case-insensitively against none, silver, and gold: silver waives the first checked bag's 40.00 fee, gold waives the first two checked bags' fees, and a waived bag still counts as the first or second bag so the remaining bags keep their escalator positions; waivers never touch carry-on or overweight charges." },
+    { "id": "R6", "rule": "Paying online takes 20% off the checked-bag base fees that remain after any waiver - not off the overweight fee and never off carry-on charges." },
+    { "id": "R7", "rule": "The function returns -1.0 instead of raising whenever carry_ons or checked is not a non-negative int (bools do not count), carry_ons exceeds 2, heaviest_kg is not a positive number, tier is not one of the three tier names, or prepaid is not a bool." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "carry-on charges", "answer": "First roller bag rides free; a second one is 35 bucks. Status does not touch carry-ons - even our top tier pays for the second one." },
+    { "id": "R2", "topic": "checked escalator", "answer": "Checked bags get pricier as you add them: 40 for the first, 55 for the second, then a flat 90 each from the third on. We want you checking one or two, not a wardrobe." },
+    { "id": "R3", "topic": "overweight fee", "answer": "Over 23 kilos on the heaviest bag and it is a flat 75 handling hit - once per passenger, not per kilo. A bag at exactly 23.0 is fine; 23.1 pays." },
+    { "id": "R4", "topic": "refused weight", "answer": "Past 32 kilos our belt crew will not lift it, so the whole request is refused with -1.0. Exactly 32.0 still flies and pays like any overweight bag." },
+    { "id": "R5", "topic": "loyalty waivers", "answer": "Silver kills the 40-dollar first-bag fee, gold kills the first two. Tier names match regardless of case. The waiver eats the earliest bags, so silver's second bag still pays the 55 second-bag price - and waivers never cover carry-ons or the overweight hit." },
+    { "id": "R6", "topic": "prepay discount", "answer": "Pay online, save 20% - but only on the checked-bag fees you actually still owe after waivers. The overweight charge and carry-ons never discount; those go to the ramp, not the website." },
+    { "id": "R7", "topic": "bad request", "answer": "Anything malformed returns -1.0 - negative bags, fractional bag counts, booleans posing as counts, three carry-ons (nobody's carrying three), a weight that is not a positive number, a made-up tier, or a prepaid flag that is not true/false. The kiosk never crashes; it just says no." },
+    { "id": "X1", "topic": "oversize baggage", "answer": "Out of scope - this schedule prices by count and weight only; dimensions and oversize surcharges live at the gate." },
+    { "id": "X2", "topic": "excess-mileage awards", "answer": "Out of scope - no redeeming points for bags here; the function prices cash fees only." }
+  ],
+  "tests_file": "tests-13-baggage-fees.py",
+  "reference_solution": "ref-13-baggage-fees.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream network-airline baggage conventions (free first carry-on with a paid second, escalating first/second/third-plus checked fees, a flat overweight hit above the standard limit with a hard refusal ceiling, status-tier fee waivers on the earliest checked bags, online check-in discount on base bag fees), not from any WiseCounsil design document. Revision 2 (2026-10-05, round-1 baseline 10%): the error-path convention (-1.0 never-raise), the float return shape, the carry-on and escalator prices, the two-carry-on cap, and the tier/prepay existence were surfaced into the public brief; the weight consequences, the waiver shape, the prepay break, and the full invalid-input set remain hidden."
+  }
+}

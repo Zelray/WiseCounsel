@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-electricity-tier-bill",
+  "track": 1,
+  "archetype": "domain-rule-calculator",
+  "language": "python",
+  "public_brief": "Our utility's billing team needs the residential statement math as code. Implement electricity_bill(kwh, days), which takes the kilowatt-hours metered over a billing period and the length of that period in days, and returns the amount the household owes in dollars as a float. A statement carries an energy line and a service line, and the rate book works like this: energy is billed in marginal blocks, like tax brackets - three blocks priced at 0.12, 0.15, and 0.20 per kWh, each block's rate applying only to the kWh that fall inside it, with the hand-off points between blocks set by the rate book; every statement carries a fixed service charge of 9.75 for the standard 30-day billing cycle, owed even when zero kWh were used, and cycles shorter or longer than the standard prorate the service charge against that standard cycle; and sales tax of 6% applies to the energy and service charges together, with the tax line worked out on that base and rounded to the nearest cent on its own before it is added to the bill. Unusable inputs raise ValueError - never return a number and never a different exception type: a negative or non-numeric reading, or a billing period that is not a whole number of at least one day. Keep it a pure function: no printing, no reading files, no network. Graders call the function directly with ordinary periods and adversarial ones - zero usage, boundary consumption, short cycles, wrong types - and compare the returned float, so every input path needs one defined behavior.",
+  "entry_contract": "Implement electricity_bill(kwh, days) taking two positional arguments - kwh (kilowatt-hours consumed in the period) and days (length of the billing period) - returning a float dollar amount and raising ValueError for unusable inputs (never a sentinel and never a different exception type).",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Energy is priced in marginal blocks: the first 500 kWh of the period at 0.12 per kWh, block two at 0.15 per kWh, block three at 0.20 per kWh, with each block's rate applying only to the kWh that fall inside it." },
+    { "id": "R2", "rule": "Block boundaries are positional: the 500th kWh bills at the first rate, the 501st at the second, and the 1001st at the third - a boundary kWh is the last kWh of the cheaper block, never the first of the dearer one." },
+    { "id": "R3", "rule": "Every bill carries a fixed service charge of 9.75 per standard 30-day period, charged even when zero kWh were used." },
+    { "id": "R4", "rule": "The fixed charge is prorated by multiplying 9.75 by days divided by 30 - the divisor stays 30 even for a 31-day cycle - and the prorated charge is rounded to the nearest cent, half up (4.875 becomes 4.88)." },
+    { "id": "R5", "rule": "Sales tax of 6% applies to the sum of the energy charges plus the prorated fixed charge, not to the energy alone." },
+    { "id": "R6", "rule": "The tax alone is rounded to the nearest cent, half up, before it is added to the subtotal; the energy and fixed parts themselves are never rounded." },
+    { "id": "R7", "rule": "Unusable inputs raise ValueError, never return a number or a different exception type: negative or non-numeric kwh, or days that is not an int of at least 1 (bools do not count as ints)." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "tier blocks", "answer": "Classic three-block residential tiering: 12 cents up to 500, 15 cents in the middle band, 20 cents above a thousand. Marginal, like tax brackets - only the units inside a block pay that block's rate." },
+    { "id": "R2", "topic": "block boundaries", "answer": "The 500th unit is the cheap block's last unit, not the middle block's first. Boundaries belong to the block below - customers notice if we shave a unit." },
+    { "id": "R3", "topic": "service charge", "answer": "Nine seventy-five per standard month shows up on every statement, even a vacant house reading zero. Meters cost money whether the wires carry anything or not." },
+    { "id": "R4", "topic": "proration", "answer": "Short or odd cycles prorate the fixed charge against a thirty-day standard - always thirty, even in a 31-day month. And prorate-then-round: 4.875 lands on 4.88, ties go up." },
+    { "id": "R5", "topic": "tax base", "answer": "The state taxes the whole delivery: energy plus the service charge. We tried taxing energy only; the auditors came back and we added the service part to the base." },
+    { "id": "R6", "topic": "tax rounding", "answer": "Tax gets its own rounding - nearest cent, ties up - before it joins the bill. The energy and fixed lines stay unrounded underneath; rounding those is what triggers complaints about a penny here and there." },
+    { "id": "R7", "topic": "bad input", "answer": "Garbage in, ValueError out - negative readings, text where a number belongs, a fractional or zero-day period. Booleans are not day counts no matter what Python thinks. We raise; we never silently bill something odd." },
+    { "id": "X1", "topic": "late payment", "answer": "Out of scope - this computes a statement amount; late fees and disconnect notices live in the collections workflow." },
+    { "id": "X2", "topic": "renewables credit", "answer": "Out of scope - no solar net-metering or feed-in credits here; this statement only charges for consumed energy." }
+  ],
+  "tests_file": "tests-10-electricity-tier-bill.py",
+  "reference_solution": "ref-10-electricity-tier-bill.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream regulated-utility billing conventions (marginal inclining block rates with boundary-units-below, fixed monthly service charge billed at zero usage, proration against a standard 30-day period, sales tax on energy plus service with per-line cent rounding), not from any WiseCounsil design document. Revision 2 (2026-10-05, round-1 baseline 0%): the error-path convention (ValueError, never a sentinel), the float return shape, the block rates, the fixed charge, the tax base, and the tax-line rounding placement were surfaced into the public brief; the block boundaries, the proration formula and divisor, and the rounding tie direction remain hidden."
+  }
+}

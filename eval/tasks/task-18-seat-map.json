@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-seat-map",
+  "track": 1,
+  "archetype": "input-validation",
+  "language": "python",
+  "public_brief": "Our ticketing kiosk sells the Marlowe theater's seats by notation, and checkout needs one function to say whether a notation names a seat the kiosk may actually sell. Implement parse_seat(notation), which takes one seat notation exactly as typed and returns the seat as a (row, seat) tuple when the kiosk can sell it, or None when it cannot - the kiosk simply re-asks, so the function never raises. The house has its quirks: an old lettering scheme, a fan-shaped floor, numbers the house never sold, and spots held for wheelchair users. Keep it a pure function: no printing, no prompting, no filesystem or network access. Graders call it directly with ordinary notations and with adversarial junk - wrong shapes, odd types, boundary rows - and compare return values, so every input needs a defined answer.",
+  "entry_contract": "Implement parse_seat(notation) taking one positional argument of any type and returning a (row_letter, seat_number) tuple of (str, int) for a sellable seat, or None for anything else; it never raises.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "The box-office notation is a single uppercase row letter immediately followed by the seat number with no space, hyphen, or padding - 'J14' - and any other spelling is invalid." },
+    { "id": "R2", "rule": "Rows run A through T, skipping the letters I and O because they read as 1 and 0 on a ticket, so row letters after T and the letters I and O name no seat." },
+    { "id": "R3", "rule": "The house is fan-shaped: rows A through D have 14 seats each and rows E through T have 22 each, so a seat number beyond its own row's capacity names no seat." },
+    { "id": "R4", "rule": "The number 13 is skipped everywhere in the house - after seat 12 comes seat 14 - so a notation with seat 13 is invalid." },
+    { "id": "R5", "rule": "The last seat of every row is a wheelchair space and is never sold, so seat 14 in rows A-D and seat 22 in rows E-T are invalid." },
+    { "id": "R6", "rule": "Anything unparseable - empty text, wrong shapes, or a non-string argument - returns None; the function never raises and never returns False." },
+    { "id": "R7", "rule": "Seat numbers are printed without decoration: numbering starts at 1, there is no seat 0, and leading zeros never appear, so 'J0' and 'J07' are invalid." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "notation shape", "answer": "Tickets read row then seat, jammed together - J14. No space, no dash, one letter only; the house has no double-letter rows." },
+    { "id": "R2", "topic": "row lettering", "answer": "A through T, but we strike I and O the way plate offices do - they read as 1 and 0 on a ticket stub. H then jumps to J." },
+    { "id": "R3", "topic": "row capacity", "answer": "Front rows A-D hold 14; from E back the house widens to 22 a row. Ask for seat 20 in row B and there is no such place." },
+    { "id": "R4", "topic": "no seat 13", "answer": "No row has a 13 - the seat plate goes 12, then 14. Old-house superstition, kept when we rebuilt." },
+    { "id": "R5", "topic": "wheelchair spaces", "answer": "The last seat of every row is a wheelchair space and stays unsold - 14 in the front rows, 22 further back. Its neighbor sells fine." },
+    { "id": "R6", "topic": "unparseable input", "answer": "Return None and never raise - None, numbers, lists, empty text, gibberish, all None. The kiosk just re-asks." },
+    { "id": "R7", "topic": "numbering style", "answer": "Seats start at 1 and print plain - no 0, no zero padding. J07 is not how the ticket prints." },
+    { "id": "X1", "topic": "seat pricing", "answer": "Out of scope - what a seat costs is the ticketing service's table, not the notation." },
+    { "id": "X2", "topic": "other venues", "answer": "Out of scope - this map is the Marlowe only; the annex has its own rows and its own validator." }
+  ],
+  "tests_file": "tests-18-seat-map.py",
+  "reference_solution": "ref-18-seat-map.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from real theater and ticketing conventions (lettered rows skipping confusable I/O, fan-shaped houses with more seats in rear rows, superstition-driven skipping of seat 13 as in aircraft and elevators, wheelchair spaces held at row ends per accessible-seating layouts, jammed row-plus-number ticket notation, None-not-raise parser posture), not from any WiseCounsil design document."
+  }
+}

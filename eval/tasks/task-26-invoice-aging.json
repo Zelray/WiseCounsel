@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-invoice-aging",
+  "track": 1,
+  "archetype": "date-aggregation",
+  "language": "python",
+  "public_brief": "Finance reads an accounts-receivable aging report off a dashboard every morning, and we need the engine behind it. Implement invoice_aging(invoices, as_of) to build it. invoices is a list of dicts, each carrying 'invoice_date', 'due_date' and 'amount'; as_of is the report date, ISO (YYYY-MM-DD). Return a dict with exactly the five keys 'current', '1-30', '31-60', '61-90' and '91+', mapping each bucket label to the total amount sitting in it. The grader imports your module and calls the function directly with ledgers of every shape and compares return values and raised exceptions, so every input path needs one defined answer. Keep it a pure function: no printing, no file or network access, no clock reads.",
+  "entry_contract": "Implement invoice_aging(invoices, as_of) taking a list of invoice dicts and an ISO date string, returning a dict with exactly the keys 'current', '1-30', '31-60', '61-90' and '91+' mapping to numeric totals.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Aging is measured from each invoice's due_date; invoice_date is informational and never affects bucketing." },
+    { "id": "R2", "rule": "An invoice due on or after the as_of date is Current - being due on the report date itself is not yet overdue." },
+    { "id": "R3", "rule": "Days past due are whole days from due_date to as_of, and each bucket's upper edge is inclusive: 1 to 30 days late is '1-30', 31 to 60 is '31-60', 61 to 90 is '61-90', and 91 or more is '91+'." },
+    { "id": "R4", "rule": "Credit notes (negative amounts) are summed into whichever bucket their own due date lands in and may push a bucket total negative; there is no netting across buckets." },
+    { "id": "R5", "rule": "Every bucket total is rounded to exactly two decimal places." },
+    { "id": "R6", "rule": "All five keys are always present in the returned dict, at 0 when nothing lands there (an empty ledger returns five zero buckets)." },
+    { "id": "R7", "rule": "A malformed date - a bad due_date or a bad as_of - raises ValueError." },
+    { "id": "R8", "rule": "An invoice row without a usable numeric amount - the 'amount' key missing, or a value that is not a number - raises ValueError." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "aging clock", "answer": "The clock starts at the due date, not the invoice date. Billing terms are billing terms - what matters is when they were supposed to pay." },
+    { "id": "R2", "topic": "due today", "answer": "Due the same day as the report? Still current. They have until the day itself; overdue starts tomorrow." },
+    { "id": "R3", "topic": "bucket edges", "answer": "Thirty days late is still '1-30'; day 31 tips it into '31-60'. Sixty stays put, sixty-one moves. Ninety stays, ninety-one is '91+'." },
+    { "id": "R4", "topic": "credit notes", "answer": "Credits sit in the bucket their own due date puts them, as negatives. We don't shove them against other invoices' buckets - each bucket can go negative on its own." },
+    { "id": "R5", "topic": "cents", "answer": "Round every bucket total to two decimals - the dashboard chokes on 0.30000000000000004." },
+    { "id": "R6", "topic": "empty buckets", "answer": "All five buckets always show, even at zero. The panel renders fixed columns; a missing key breaks it." },
+    { "id": "R7", "topic": "bad dates", "answer": "A date that won't parse raises ValueError. Finance would rather see the job fail than get a quietly wrong aging." },
+    { "id": "R8", "topic": "bad amounts", "answer": "A row with no usable number in 'amount' raises ValueError, same as a bad date - a missing or non-numeric amount is a ledger defect, and finance sees the job fail rather than a quietly wrong total." },
+    { "id": "X1", "topic": "collections workflow", "answer": "Out of scope - dunning letters and collector assignment are the AR team's process, not this report." },
+    { "id": "X2", "topic": "currency conversion", "answer": "Out of scope - amounts arrive in one currency; FX lives upstream in the ledger." }
+  ],
+  "tests_file": "tests-26-invoice-aging.py",
+  "reference_solution": "ref-26-invoice-aging.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from standard accounts-receivable aging practice - due-date-based buckets at 30/60/90 with inclusive edges, same-day-due still current, in-place credit netting, fixed report columns - not from any WiseCounsil design document. Revision 2 (2026-10-05): after an 8/10 calibration baseline, the credit-note labelling and the adversarial-input enumeration were removed from the public brief so credit-note handling and the bucket-edge conventions stay hidden, and a malformed-amount rule (R8) was added with its own test (the two R2 tests were merged to keep the 10-test contract); the grading sentence now reads 'return values and raised exceptions' so the brief no longer implies that only return values are compared."
+  }
+}

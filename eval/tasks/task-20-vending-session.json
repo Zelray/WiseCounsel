@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-vending-session",
+  "track": 1,
+  "archetype": "state-machine",
+  "language": "python",
+  "public_brief": "Our vending firmware team wants the transaction session modeled before anyone touches hardware. Implement vend_step(state, event, amount_cents=0, credit_cents=0, price_cents=0) as a pure reducer and return a tuple (next_state, credit_cents). The session state is one of the strings idle, collecting, exact_change, dispensing; events are the strings coin, select, refund. amount_cents is the value of the coin being inserted (leave 0 for the other events), credit_cents is the credit already sitting in the session, and price_cents is the price of the one product this machine sells. Graders call the function directly with ordinary purchase flows and with adversarial ones - odd amounts, every event fired in every state, junk states and events - and compare the returned tuples, so every combination needs a defined answer. Pure function: no printing, no I/O, no exceptions.",
+  "entry_contract": "Implement vend_step(state, event, amount_cents=0, credit_cents=0, price_cents=0) taking two strings then three ints as positional arguments and returning a (state_string, credit_int) tuple for every input combination.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "A coin with a positive multiple-of-5 amount adds amount_cents to the credit; the first coin from idle moves the session to collecting, and in collecting (or exact_change) further coins keep stacking with no cap." },
+    { "id": "R2", "rule": "The coin slot only accepts positive multiples of 5: an amount of zero, negative, or not a multiple of 5 is ignored entirely - same state, same credit." },
+    { "id": "R3", "rule": "select in collecting with credit_cents at or above price_cents vends: it returns (\"dispensing\", 0) - the machine keeps the price and the leftover credit goes back as change." },
+    { "id": "R4", "rule": "select when the credit is below price_cents returns its inputs unchanged - no vend, no error - whatever the state." },
+    { "id": "R5", "rule": "In exact_change, a coin that would push the credit above price_cents is refused unchanged (the machine cannot make change); coins that keep the credit at or below the price are accepted and the session stays exact_change." },
+    { "id": "R6", "rule": "In exact_change, select vends only on an exact match - credit_cents equal to price_cents returns (\"dispensing\", 0); a credit above the price is refused unchanged." },
+    { "id": "R7", "rule": "refund from collecting or exact_change returns (\"idle\", 0); refund from idle is a no-op that also returns (\"idle\", 0)." },
+    { "id": "R8", "rule": "dispensing is terminal - every event there returns (\"dispensing\", 0) - and any unknown state or event name returns its inputs unchanged without raising." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "credit accumulation", "answer": "Every good coin stacks onto the credit with no cap. The first coin from idle wakes the session into collecting, and in exact_change the coins keep stacking too - dropping money in doesn't reset the mode." },
+    { "id": "R2", "topic": "coin slot", "answer": "The slot only takes positive multiples of five - nickels on up. Pennies, odd-value slugs, zero, and negatives are ignored outright: same state, same credit, no complaint." },
+    { "id": "R3", "topic": "successful vend", "answer": "Select with credit at or over the price vends: state goes to dispensing and the credit zeroes out - the machine keeps the price and hands the rest back as change." },
+    { "id": "R4", "topic": "short credit", "answer": "Select with credit under the price does nothing at all - same state, same credit. No error, no partial vend, it just sits there." },
+    { "id": "R5", "topic": "exact-mode coins", "answer": "In exact_change a coin that would push credit over the price is refused - the change hopper is empty and we can't make change. Coins that keep it at or under the price go through, and the session stays in exact_change." },
+    { "id": "R6", "topic": "exact-mode vend", "answer": "Exact-change mode vends only on a perfect match: credit equals price, you get dispensing and zero. Credit over the price is refused - we'd owe change we can't give." },
+    { "id": "R7", "topic": "coin return", "answer": "Refund wipes the session: back to idle with zero credit, from collecting or exact_change alike. From idle it's a harmless no-op - idle, zero." },
+    { "id": "R8", "topic": "dead ends", "answer": "dispensing is the end of the line - any event there returns dispensing, zero. And unknown states or events hand back exactly what came in; nothing ever throws." },
+    { "id": "X1", "topic": "inventory and planograms", "answer": "Out of scope - this machine sells one fixed-price product; stock counts and spiral assignments are the stocker's problem." },
+    { "id": "X2", "topic": "coin-jam hardware", "answer": "Out of scope - no jam sensors or diagnostics here; the reducer only sees clean events." }
+  ],
+  "tests_file": "tests-20-vending-session.py",
+  "reference_solution": "ref-20-vending-session.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from real vending-machine conventions (nickel-multiple coin mechanisms that reject pennies, uncapped credit accumulation, dispense-and-return-change, exact-change-only mode that refuses overpayment, coin-return reset, vend as a terminal state), not from any WiseCounsil design document."
+  }
+}

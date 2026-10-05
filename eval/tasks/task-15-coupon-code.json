@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-coupon-code",
+  "track": 1,
+  "archetype": "input-validation",
+  "language": "python",
+  "public_brief": "Our checkout takes promo codes from a text box and decides on the spot whether to honor them. Implement validate_coupon_code(code), which takes the code exactly as typed and either honors it or rejects it: an issued code returns True, and every rejection - wrong shape, unknown campaign, junk of any kind - is a ValueError, never a False and never any other exception type. The checkout greps the exception message to pick its customer hint, so two message conventions are fixed and public: a non-string argument (None, a number, a list, bytes) must raise ValueError with 'invalid' in the message, and an empty or all-whitespace string must raise ValueError with 'empty' in the message. Codes we issue all come out of campaigns - four of them, named for the seasons - and some words never get printed on a coupon; the validator owns all of that. Keep it a pure function: no printing, no prompting, no filesystem or network access. Graders call it directly with real-looking codes and with adversarial junk - padded text, wrong shapes, odd types - and expect a defined result for every input.",
+  "entry_contract": "Implement validate_coupon_code(code) taking one positional argument of any type; return True for an acceptable code and raise ValueError for every rejection, never any other exception type. Message keywords are part of the contract: a non-string argument produces a message containing 'invalid', and an empty or all-whitespace string produces a message containing 'empty'.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "A valid code opens with a three-letter campaign tag - exactly SPR, SUM, FAL, or WIN, the store's four seasonal campaigns - immediately followed by a hyphen; any other tag means the code was not issued here. (The brief states the count and seasonal theme, not the abbreviations.)" },
+    { "id": "R2", "rule": "The whole code is exactly nine characters: three tag letters, the hyphen, then a five-character body; eight, ten, or any other length is invalid." },
+    { "id": "R3", "rule": "Characters after the hyphen are uppercase letters and digits only, and the tag letters are uppercase too; a lowercase letter or a second symbol anywhere makes the code invalid." },
+    { "id": "R4", "rule": "The substrings VOID and FREE never appear in an issued body - voided codes and hand-issued freebies were getting typed in by scammers - so a body containing either is invalid." },
+    { "id": "R5", "rule": "The final body character is the campaign version digit, so a body ending in a letter is invalid." },
+    { "id": "R6", "rule": "A non-string argument (None, a number, a list, bytes) raises ValueError with 'invalid' in the message and never TypeError, because the checkout's catch clause only knows ValueError. (Error posture stated in the public brief and entry_contract.)" },
+    { "id": "R7", "rule": "An empty or all-whitespace string raises ValueError with 'empty' in the message. (Error posture stated in the public brief and entry_contract.)" }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "campaign tags", "answer": "Four campaigns run this year: SPR, SUM, FAL, WIN - the seasons. Anything else up front, including other stores' codes, was not issued by us. (The brief admits four seasonal campaigns; the exact abbreviations stay hidden.)" },
+    { "id": "R2", "topic": "code length", "answer": "Nine characters on the nose: tag, hyphen, five-character body. The registrar rejects anything else at issue time, so a longer or shorter string is not one of ours." },
+    { "id": "R3", "topic": "character set", "answer": "Caps and digits only, in the tag and in the body. Lowercase never gets printed, and a second symbol means somebody hand-edited the code." },
+    { "id": "R4", "topic": "banned words", "answer": "VOID and FREE never appear on an issued coupon - scammers were typing voided codes and hand-issued freebies into checkout - so we block those substrings outright." },
+    { "id": "R5", "topic": "version digit", "answer": "The last body character is the campaign version digit. Coupons ending in a letter are from the paper days; nothing current looks like that." },
+    { "id": "R6", "topic": "bad input type", "answer": "A number, None, a list - all ValueError with 'invalid' in the message. The checkout's catch clause only knows ValueError; a TypeError would 500 the page. (Stated in the public brief and entry_contract, so it is a free rule for anyone who reads.)" },
+    { "id": "R7", "topic": "blank codes", "answer": "Empty or whitespace-only raises ValueError with 'empty' in the message so the form can show its friendly 'type a code' hint. (Stated in the public brief and entry_contract.)" },
+    { "id": "X1", "topic": "discount amount", "answer": "Out of scope - how much the code takes off lives in the promotions service; this validator only says yes or no." },
+    { "id": "X2", "topic": "expiry and limits", "answer": "Out of scope - redemption counts and end dates are checked at apply time against the promotions database, not from the string." }
+  ],
+  "tests_file": "tests-15-coupon-code.py",
+  "reference_solution": "ref-15-coupon-code.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from retail promo-code conventions (seasonal campaign prefixes, fixed registrar-issued length, uppercase alphanumeric bodies, blocklisted scam substrings like FREE, trailing campaign version digits, checkout-layer ValueError handling), not from any WiseCounsil design document. Revision 2026-10-05 after difficulty calibration (round-1 baseline 10%): the ValueError-only error posture and its two message-keyword conventions ('invalid' for non-string input, 'empty' for blank input) were moved into the public brief and entry_contract, the brief now states the tag set's count and seasonal theme without revealing the abbreviations, and the tag, length, and banned-substring test pairs were merged so each still-hidden convention costs at most one test."
+  }
+}

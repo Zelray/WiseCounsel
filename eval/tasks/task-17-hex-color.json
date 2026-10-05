@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-hex-color",
+  "track": 1,
+  "archetype": "input-validation",
+  "language": "python",
+  "public_brief": "Our design-system portal has a color field where designers paste hex swatches, and a backend gate decides on the spot whether a value may enter the brand palette. Implement is_valid_brand_color(color), which takes the value exactly as pasted and returns True when the toolkit would accept it and False when it would bounce it. The toolkit only speaks hex, it recognizes a specific set of notations, and a couple of tones are spoken for; the gate owns all of that. Keep it a pure function: no printing, no prompting, no filesystem or network access. Graders call it directly with ordinary swatches and with adversarial junk - odd lengths, weird casing, odd types - and compare return values, so every input path needs a defined answer.",
+  "entry_contract": "Implement is_valid_brand_color(color) taking one positional argument of any type and returning a strict bool (True or False) for every input.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Exactly three notations are accepted: #RGB (three hex digits), #RRGGBB (six), and #RRGGBBAA (eight), always opening with '#'; the four-digit short-alpha form #RGBA, any other length, and a value with no leading hash are all invalid." },
+    { "id": "R2", "rule": "CSS-style color names such as 'red', 'aliceblue', or 'transparent' are rejected - the toolkit takes hex strings only." },
+    { "id": "R3", "rule": "Hex digits are case-insensitive: upper, lower, and mixed case within one value are all accepted." },
+    { "id": "R4", "rule": "Pure black #000000 and pure white #FFFFFF are reserved for the layout canvas and are never brand colors; they are rejected in any accepted notation, including the short forms #000 and #FFF and any alpha-suffixed spelling, while mid-grays such as #808080 are fine." },
+    { "id": "R5", "rule": "In the eight-digit form the alpha byte must be strictly between 00 and FF: 00 is invisible and FF is just the opaque six-digit color, so #RRGGBB00 and #RRGGBBFF are rejected." },
+    { "id": "R6", "rule": "Any non-string argument returns False and never raises; numeric RGB ints are not coerced." },
+    { "id": "R7", "rule": "The value is judged exactly as typed: leading or trailing whitespace is never trimmed and makes it False." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "accepted notations", "answer": "Three shapes ship from the toolkit: #RGB, #RRGGBB, #RRGGBBAA. The short-with-alpha #RGBA never made it into the toolkit, and the picker always sends the hash - a bare hex string is a paste accident." },
+    { "id": "R2", "topic": "named colors", "answer": "Hex only. The moment we allowed 'cornflowerblue' we had two sources of truth, so keywords bounce." },
+    { "id": "R3", "topic": "letter case", "answer": "Case means nothing to us - FF, ff, and fF in the same value are all the same color. Designers paste from five different tools." },
+    { "id": "R4", "topic": "reserved grays", "answer": "Pure black and pure white belong to the layout canvas - type and paper - so no brand swatch can use them in any spelling. Mid-grays are open season." },
+    { "id": "R5", "topic": "alpha bounds", "answer": "Alpha 00 is invisible and FF is just the six-digit color wearing a coat, so both are rejected at the door. Anything strictly between ships fine." },
+    { "id": "R6", "topic": "bad input type", "answer": "Anything that isn't text comes back False - we do not coerce the numeric RGB int somebody pastes from a JS console." },
+    { "id": "R7", "topic": "whitespace", "answer": "Judge it as typed. A padded value fails; the form field is supposed to have handled trimming before we ever see it." },
+    { "id": "X1", "topic": "contrast ratios", "answer": "Out of scope - WCAG contrast math happens in the theme checker, not the swatch gate." },
+    { "id": "X2", "topic": "palette storage", "answer": "Out of scope - no database, no lookup against saved swatches; this is a pure predicate on the string." }
+  ],
+  "tests_file": "tests-17-hex-color.py",
+  "reference_solution": "ref-17-hex-color.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from real brand-guideline and CSS hex-color conventions (#RGB/#RRGGBB/#RRGGBBAA notations with the short-alpha #RGBA form often unsupported, mandatory hash, case-insensitive hex digits, reserved black/white canvas tones, alpha windows that exclude the degenerate 00 and FF bytes, strict-string validation posture), not from any WiseCounsil design document."
+  }
+}

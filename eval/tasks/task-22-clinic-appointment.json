@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-clinic-appointment",
+  "track": 1,
+  "archetype": "state-machine",
+  "language": "python",
+  "public_brief": "The front-desk app needs appointment status moves locked down before the patient-portal release. Implement update_appointment(state, event, minutes_until_appointment=0) as a pure reducer returning the status string after the event. Statuses are the strings booked, checked_in, in_room, completed, no_show, cancelled - note the spelling of cancelled. Events are the strings check_in, start_visit, complete, cancel, mark_no_show. minutes_until_appointment counts down to the scheduled start, so negative values mean the start is already that many minutes past; it defaults to 0. Graders call the function directly with ordinary visit flows and with adversarial ones - every event fired in every status, borderline minute counts, misspelled and unknown names - and compare return values, so every combination needs a defined answer. Pure function only: no printing, no I/O, no exceptions.",
+  "entry_contract": "Implement update_appointment(state, event, minutes_until_appointment=0) taking two string arguments and an int minute count (default 0, may be negative), and returning a plain status string for every input combination.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "check_in from booked is refused while minutes_until_appointment is above 30 (the kiosk opens 30 minutes before the start, and 30 exactly is allowed): the appointment stays booked." },
+    { "id": "R2", "rule": "check_in from booked is accepted down to 15 minutes past the start: minutes_until_appointment of -15 or more returns checked_in, while later than -15 records the forfeited slot as no_show instead." },
+    { "id": "R3", "rule": "checked_in + start_visit returns in_room, and in_room + complete returns completed - each step strictly from its immediate predecessor and never from booked." },
+    { "id": "R4", "rule": "mark_no_show from booked lands on no_show only once the start time has arrived or passed (minutes_until_appointment of 0 or less); before the start it is refused and the appointment stays booked." },
+    { "id": "R5", "rule": "cancel from booked lands on cancelled only strictly before the start (minutes_until_appointment above 0); from the start minute onward the cancel is refused and the appointment stands." },
+    { "id": "R6", "rule": "completed, no_show, and cancelled are terminal: every event on them returns the state unchanged." },
+    { "id": "R7", "rule": "Any unlisted state and event pairing returns the state unchanged and never raises - cancel after check-in, a second check_in, start_visit straight from booked, completing before a room." },
+    { "id": "R8", "rule": "State and event names match exactly and case-sensitively; any unknown or misspelled name returns the input state unchanged without raising." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "kiosk opens early", "answer": "Check-in opens 30 minutes before the start - anything earlier and the kiosk isn't even on, the appointment just stays booked. Right at 30 it works." },
+    { "id": "R2", "topic": "late arrivals", "answer": "We take late check-ins up to 15 minutes past the start - exactly 15 late still checks you in. Beyond that the slot was forfeited, so we record no_show instead of a check-in." },
+    { "id": "R3", "topic": "visit progression", "answer": "checked_in goes to in_room on start_visit, and in_room goes to completed on complete - strictly in that order, one step each, never straight from booked." },
+    { "id": "R4", "topic": "marking no-shows", "answer": "Front desk can mark a no_show once the start time hits - at 0 or any time after. Before the start it's refused; nobody is a no-show to a future appointment." },
+    { "id": "R5", "topic": "cancellation cutoff", "answer": "Cancelling works strictly before the start. From the start minute onward the cancel is refused and the appointment stands for the no-show decision instead." },
+    { "id": "R6", "topic": "final states", "answer": "completed, no_show, and cancelled are terminal - nothing moves them again, no exceptions." },
+    { "id": "R7", "topic": "unmapped moves", "answer": "Every pairing we didn't map leaves the status alone - cancel after check-in, a second check-in, completing before a room. Quietly unchanged, never a crash." },
+    { "id": "R8", "topic": "names match", "answer": "States and events match exactly, case-sensitively - misspelled or unknown names hand back the input status untouched." },
+    { "id": "X1", "topic": "billing and copays", "answer": "Out of scope - copays and insurance capture happen at the kiosk, not in this reducer." },
+    { "id": "X2", "topic": "provider schedules", "answer": "Out of scope - room and provider assignment is the scheduling engine's job; this only tracks the visit's status." }
+  ],
+  "tests_file": "tests-22-clinic-appointment.py",
+  "reference_solution": "ref-22-clinic-appointment.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from real clinic front-desk conventions (a check-in kiosk that opens a fixed window before the visit, a late-arrival cutoff after which the slot is a no-show, front-desk no-show marking only at or after start time, cancellations cut off at the start minute, terminal visit outcomes), not from any WiseCounsil design document."
+  }
+}

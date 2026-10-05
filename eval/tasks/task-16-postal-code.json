@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-postal-code",
+  "track": 1,
+  "archetype": "input-validation",
+  "language": "python",
+  "public_brief": "Our checkout serves three markets, and each country's postal system has its own idea of what a postal code looks like. Implement is_valid_postal_code(code, country) - code is what the customer typed into the field, country is the two-letter market code the storefront sends ('NV', 'KE', or 'ZR'). The function answers one question: is this a well-formed postal code for that market? Return True when the shape is right for the named market and False for everything else, including markets we do not operate in. Keep it a pure function: no printing, no prompting, no filesystem or network access. Graders call it directly with ordinary codes and with adversarial values - wrong shapes, padded text, mixed case, unknown markets - and compare return values, so every combination needs a defined answer.",
+  "entry_contract": "Implement is_valid_postal_code(code, country) taking two positional arguments and returning a strict bool (True or False) for every combination.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Only the market codes NV, KE, and ZR are recognized; any other country value, including well-known real ones, returns False rather than being guessed at." },
+    { "id": "R2", "rule": "NV (Norvalia) codes are exactly four digits, then a single space, then two uppercase letters, e.g. 2214 HB; wrong digit or letter counts are False." },
+    { "id": "R3", "rule": "In NV the two-letter suffix never begins with Q or X - those openings are reserved for overseas territories that receive no residential deliveries - so a suffix starting with either letter is False, while Q or X in the second position is fine." },
+    { "id": "R4", "rule": "KE (Kestria) codes are exactly two uppercase letters, a hyphen, then four digits whose first digit is 1-9: sorting district 0 does not exist, so a zero-leading digit block is False." },
+    { "id": "R5", "rule": "ZR (Zubria) codes are exactly six digits with no separators, and the first digit is a province number running only 1-6, so a leading 0, 7, 8, or 9 is False." },
+    { "id": "R6", "rule": "Codes are judged exactly as typed: leading or trailing whitespace fails in every market, and the only internal space allowed is NV's single separator - KE and ZR never contain spaces." },
+    { "id": "R7", "rule": "Letters in the code must be uppercase as printed, so a lowercase letter makes it False in every market, while the country argument is matched case-insensitively so 'nv' names the same market as 'NV'." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "supported markets", "answer": "We ship to Norvalia, Kestria, and Zubria only. If the storefront sends any other country code we say False - we do not pretend to know another country's format." },
+    { "id": "R2", "topic": "Norvalia format", "answer": "Four digits, one space, two capital letters - think 2214 HB. That is the whole shape; no hyphen version, no run-together version." },
+    { "id": "R3", "topic": "territory suffixes", "answer": "The overseas territories take the Q and X openings and they get no home delivery, so a suffix starting Q or X is not a customer code. Q or X in the second spot is ordinary street mail - fine." },
+    { "id": "R4", "topic": "Kestria format", "answer": "Two capitals, hyphen, four digits, and the district number starts at 1 - there is no district zero. AB-0123 was never a sorting district." },
+    { "id": "R5", "topic": "Zubria format", "answer": "Six digits, solid, no separator. First digit is the province, one through six; anything else up front is not one of ours." },
+    { "id": "R6", "topic": "spacing", "answer": "Judge the field as typed - padded input fails, and the only space anywhere is the one Norvalia puts in the middle. Kestria and Zubria are airtight." },
+    { "id": "R7", "topic": "case handling", "answer": "Printed codes are capitals, so lowercase letters in the code fail as typed. The country argument is friendlier - nv, Nv, NV all name Norvalia." },
+    { "id": "X1", "topic": "delivery routing", "answer": "Out of scope - this is a shape check. Which depot a code routes to lives in the logistics service." },
+    { "id": "X2", "topic": "address completeness", "answer": "Out of scope - street, city, and house-number validation is the address form's job; this function only sees the code string." }
+  ],
+  "tests_file": "tests-16-postal-code.py",
+  "reference_solution": "ref-16-postal-code.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from real multi-country postal conventions (fixed per-country shapes, first-digit district/province routing with no zero district, reserved letter openings for overseas territories as in the Netherlands' unused suffix pairs, spaced vs run-together formats, uppercase-as-printed codes, lenient country-code casing), not from any WiseCounsil design document."
+  }
+}

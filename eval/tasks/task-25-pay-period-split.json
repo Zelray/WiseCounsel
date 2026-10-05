@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-pay-period-split",
+  "track": 1,
+  "archetype": "date-aggregation",
+  "language": "python",
+  "public_brief": "Payroll prorates an employee's first pay period, and the platform team owns the math. Implement pay_period_split(period_start, period_end, hire_date). The period is one biweekly pay window given as two ISO date strings (YYYY-MM-DD); hire_date is the day the employee started, also ISO (YYYY-MM-DD). Answer one question: of the days in this pay period, how many are payable to this employee? Return a tuple (payable_days, total_days) of plain ints, where total_days is the size of the whole period regardless of the hire date. The grader imports your module and calls the function directly with routine windows and adversarial ones - hires on the edges, hires outside the window, malformed arguments - and compares return values exactly, so every input path needs one defined answer. Keep it a pure function: no printing, no file or network access, no clock reads.",
+  "entry_contract": "Implement pay_period_split(period_start, period_end, hire_date) taking three ISO date strings and returning a tuple of two ints (payable_days, total_days).",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Every calendar day in the period counts as a payable day - weekends and holidays included; payroll accrues daily, not per business day." },
+    { "id": "R2", "rule": "Both period endpoints are inclusive: a period running Monday to the Sunday fourteen days later spans exactly 14 days, and a one-day period where start equals end spans 1." },
+    { "id": "R3", "rule": "The hire date itself is a payable day - an employee hired on the period's last day earns that one day." },
+    { "id": "R4", "rule": "A hire date before period_start makes the entire period payable (payable equals total)." },
+    { "id": "R5", "rule": "A hire date after period_end pays nothing - payable is 0 - and the comparison is strict, so a hire on the day right after the period still gets zero." },
+    { "id": "R6", "rule": "A period whose end is before its start is malformed and raises ValueError." },
+    { "id": "R7", "rule": "Any date argument that is not a YYYY-MM-DD string raises ValueError rather than being coerced or ignored." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "which days count", "answer": "Calendar days, all of them - weekends count, holidays count. Salaried folks accrue every single day of the period." },
+    { "id": "R2", "topic": "period boundaries", "answer": "Both ends inclusive. Monday through the Sunday two weeks later is 14 days, not 13. A start equal to the end is a one-day period." },
+    { "id": "R3", "topic": "hire day", "answer": "Your first day is a paid day. Start on the last day of the period and you still earned that day." },
+    { "id": "R4", "topic": "hired before the window", "answer": "If they were on staff before the period opened, the whole period is theirs - no proration at all." },
+    { "id": "R5", "topic": "hired after the window", "answer": "Joined after the period closed, zero payable days - and the day right after the period is still after, so still zero." },
+    { "id": "R6", "topic": "reversed period", "answer": "An end date before the start date is a data-entry bug; raise ValueError rather than quietly paying someone negative days." },
+    { "id": "R7", "topic": "bad date arguments", "answer": "Anything that won't parse as YYYY-MM-DD raises ValueError. Payroll would rather break loudly than cut a check off a guessed date." },
+    { "id": "X1", "topic": "overtime", "answer": "Out of scope - this splits days, not hours; overtime lives in the time-tracking system." },
+    { "id": "X2", "topic": "tax withholding", "answer": "Out of scope - no money math here; withholding is computed downstream from the day counts." }
+  ],
+  "tests_file": "tests-25-pay-period-split.py",
+  "reference_solution": "ref-25-pay-period-split.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream payroll proration practice - inclusive pay windows, daily accrual that counts weekends, first-day-payable hires, loud failure on malformed periods - not from any WiseCounsil design document."
+  }
+}

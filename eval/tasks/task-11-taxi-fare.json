@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-taxi-fare",
+  "track": 1,
+  "archetype": "domain-rule-calculator",
+  "language": "python",
+  "public_brief": "The city's taxi commission wants the meter logic written down as code so the mobile app quotes exactly what the cab's meter would show. Implement taxi_fare(distance_miles, start_hour, airport), which takes the trip distance in miles, the hour the ride started on a 24-hour clock, and whether the ride is an airport run, and returns the fare in dollars as a float. Build it the way meters have always built them: every ride opens with a 3.00 flag-drop charge the moment the hack lifts, before any distance is priced, even a ride of zero miles; distance is priced per mile at 2.50 when the start counts as daytime and 3.10 when it counts as night, with the tariff deciding which clock hours are day and which are night; airport runs are priced by their own tariff line and ignore the street pricing entirely; nothing under the 8.00 minimum fare leaves the curb, so a metered amount under 8.00 becomes exactly 8.00; and the screen shows half-dollar steps, so whatever the meter works out is rounded to the nearest 0.50 as the very last step, after everything else. A fare we cannot compute comes back as exactly -1.0 - the dispatcher screen treats that as ask-the-driver; it never raises and never returns None. Keep it a pure function: no printing, no files, no network. Graders call it directly with ordinary trips and adversarial ones - boundary hours, awkward distances, wrong types - and compare the returned float, so every input path needs one defined answer.",
+  "entry_contract": "Implement taxi_fare(distance_miles, start_hour, airport) taking three positional arguments - distance_miles (trip length in miles), start_hour (0-23 hour the ride started), airport (bool) - and returning a float for every input, with -1.0 as the defined cannot-compute value in place of any exception.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "Every ride opens with a 3.00 flag-drop charge, added before any distance is priced, including a ride of zero miles." },
+    { "id": "R2", "rule": "Distance is charged per mile at 2.50 when the ride starts in the daytime - start_hour 5 through 21 inclusive - and at 3.10 at night, meaning start_hour 22, 23, 0, 1, 2, 3, or 4." },
+    { "id": "R3", "rule": "Distance is metered in tenths of a mile and any fraction of a tenth rounds up (3.24 miles meters as 3.3), while a distance that is already a whole number of tenths meters exactly as given." },
+    { "id": "R4", "rule": "When airport is true the fare is a flat 42.00 - no flag drop, no day or night rate, no minimum - regardless of distance or start hour." },
+    { "id": "R5", "rule": "If the metered amount (flag drop plus distance charge) comes to less than 8.00, the fare is bumped up to exactly 8.00; an amount of exactly 8.00 or more is untouched." },
+    { "id": "R6", "rule": "As the last step the fare is rounded to the nearest 0.50, with an exact tie rounding up (a metered 8.25 becomes 8.50 and a 9.82 becomes 10.00); the minimum-fare bump happens before this rounding." },
+    { "id": "R7", "rule": "The function returns -1.0 instead of raising whenever distance_miles is negative or not a number, start_hour is not an int in 0-23 (bools and floats like 12.0 do not count as hours), or airport is not a bool." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "flag drop", "answer": "Three bucks the second the hack lifts - every ride, even if the passenger changes their mind at zero miles. It is on before the wheels move." },
+    { "id": "R2", "topic": "day-night rate", "answer": "Day miles run 2.50, night miles 3.10. Day is hour 5 through 21 - 5 a.m. counts as day, 10 p.m. does not. It is the start hour that locks the rate for the whole ride." },
+    { "id": "R3", "topic": "meter increments", "answer": "The meter clicks in tenths of a mile and never clicks down - a hair under a tenth still clicks the next tenth. A clean 2.1 stays 2.1; we do not punish exact distances." },
+    { "id": "R4", "topic": "airport flat", "answer": "Airport runs are a flat 42, end of story - no drop charge, no night premium, no minimum. Flat means the number does not move no matter the hour or the distance." },
+    { "id": "R5", "topic": "minimum fare", "answer": "Nothing under eight dollars leaves the curb - if the meter says less, the rider pays 8.00. Exactly eight or better rides as metered." },
+    { "id": "R6", "topic": "final rounding", "answer": "The screen shows half-dollar steps: nearest 50 cents, ties up - 8.25 shows as 8.50. The minimum bump applies to the metered number first, then we round for display. That is the last step, nothing after it." },
+    { "id": "R7", "topic": "bad request", "answer": "A fare we cannot compute comes back as -1.0 - the dispatcher screen treats that as 'ask the driver', it never crashes. Negative or non-numeric distance, an hour that is not a whole hour 0-23 (booleans and 12.0 are not hours), or a non-boolean airport flag." },
+    { "id": "X1", "topic": "tipping", "answer": "Out of scope - the meter quotes the fare only; gratuity is between the rider and the driver." },
+    { "id": "X2", "topic": "surge pricing", "answer": "Out of scope - no demand-based surge multipliers here; the rates are fixed by the commission tariff." }
+  ],
+  "tests_file": "tests-11-taxi-fare.py",
+  "reference_solution": "ref-11-taxi-fare.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from municipal taximeter conventions (flag-drop fee, day/night rate split on the clock hour, distance metering in upward-rounded increments, airport flat-rate override, minimum-fare floor, display rounding to coin-sized steps), not from any WiseCounsil design document. Revision 2 (2026-10-05, round-1 baseline 0%): the error-path convention (-1.0 never-raise), the float return shape, the flag drop, the day/night rates, the minimum fare, and the half-dollar display grid were surfaced into the public brief; the day/night hour boundaries, the metering increments, the airport flat value, and the rounding tie direction remain hidden."
+  }
+}

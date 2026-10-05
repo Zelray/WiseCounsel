@@ -1,0 +1,37 @@
+{
+  "task_id": "T1-kyc-verification",
+  "track": 1,
+  "archetype": "state-machine",
+  "language": "python",
+  "public_brief": "Compliance wants the onboarding verification pipeline as a straight state machine before we integrate the screening vendor. Implement advance_kyc(state, event, resubmission_count=0) as a pure reducer returning the pipeline state string afterwards. States are the strings pending, review, approved, rejected, resubmit. Events are the strings screen, approve, reject, request_docs, resubmit. resubmission_count is how many times the applicant has already been bounced back for new documents, defaulting to 0. Graders call the function directly with ordinary case flows and with adversarial ones - events fired in states that never expect them, unknown or oddly cased names, counts at and beyond every limit - and compare return values, so every combination needs a defined answer. No printing, no I/O, no exceptions: the function is called directly and only its return value is judged.",
+  "entry_contract": "Implement advance_kyc(state, event, resubmission_count=0) taking two string arguments and a non-negative int count (default 0), and returning a plain state string for every input combination.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "pending + screen is the only door into review - a pending case nobody has screened cannot be approved or rejected directly." },
+    { "id": "R2", "rule": "review + approve returns approved." },
+    { "id": "R3", "rule": "review + reject returns rejected." },
+    { "id": "R4", "rule": "review + request_docs returns resubmit - unreadable or expired documents bounce the case back to the applicant." },
+    { "id": "R5", "rule": "resubmit + resubmit returns pending while resubmission_count is below 2; once two resubmissions have already been used (count of 2 or more) the case is dead and the same event returns rejected - the third strike is permanent." },
+    { "id": "R6", "rule": "approved and rejected are terminal: every event on them returns the state unchanged, because there is no appeal or reopen path." },
+    { "id": "R7", "rule": "Any unlisted state and event pairing returns the state unchanged and never raises - approve or reject straight from pending, request_docs on a pending case, screening twice, acting on resubmit with anything but resubmit." },
+    { "id": "R8", "rule": "State and event names match exactly and case-sensitively; any unknown or misspelled name returns the input state unchanged without raising." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "screening door", "answer": "Screen is the only way into review. A pending case nobody has screened can't be approved or rejected directly - no shortcuts, even for VIPs." },
+    { "id": "R2", "topic": "approval", "answer": "Approve on a case in review and it lands approved." },
+    { "id": "R3", "topic": "rejection", "answer": "Reject on a case in review and it lands rejected." },
+    { "id": "R4", "topic": "doc bounce", "answer": "request_docs on review bounces the case to resubmit - blurry photo, expired passport, whatever it was goes back to the applicant to fix." },
+    { "id": "R5", "topic": "two-strike cap", "answer": "Applicants get two bites at the apple: resubmit re-enters pending while fewer than two resubmissions are already used. On the third strike - count at 2 or more - the case is dead and resubmitting reports rejected." },
+    { "id": "R6", "topic": "terminal decisions", "answer": "approved and rejected are final - no appeal, no reopen, no special favors. Every event on them is ignored." },
+    { "id": "R7", "topic": "unmapped moves", "answer": "Pairs we never mapped return the state unchanged - no direct approvals from pending, no screening twice, no docs requested on a resubmit case. Quietly unchanged, never an exception." },
+    { "id": "R8", "topic": "names match", "answer": "State and event names match exactly and case-sensitively; anything unknown or misspelled comes back untouched." },
+    { "id": "X1", "topic": "sanctions screening", "answer": "Out of scope - PEP and sanctions list matching is the vendor's engine; we just route the states." },
+    { "id": "X2", "topic": "document OCR", "answer": "Out of scope - OCR quality scoring lives upstream; this reducer only counts resubmissions." }
+  ],
+  "tests_file": "tests-23-kyc-verification.py",
+  "reference_solution": "ref-23-kyc-verification.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream KYC/identity-verification pipeline conventions (queue screening before human review, approve/reject decisions, document re-request bounce-back, a bounded number of resubmission attempts before permanent rejection, terminal decisions with no reopen), not from any WiseCounsil design document."
+  }
+}

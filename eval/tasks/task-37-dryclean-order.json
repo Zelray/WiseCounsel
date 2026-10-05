@@ -1,0 +1,35 @@
+{
+  "task_id": "T1-dryclean-order",
+  "track": 1,
+  "archetype": "domain-rule-calculator",
+  "language": "python",
+  "public_brief": "Our counter has priced tickets the same way for thirty years, and the register rewrite needs that math in code. Implement price_order(items, express): items is a list of (garment_type, quantity) pairs, garment_type is a lowercase string exactly as printed on the rate card, quantity is a positive whole number of pieces, and express is a bool for same-day service. Return the ticket total in dollars as a float. The rate card: shirt 3.50, pants 4.50, coat 9.00, dress 7.00, blouse 4.25, sweater 5.75, tie 2.50, bedsheet 6.00, pillowcase 2.25, duvet 12.50, tablecloth 5.25, leather jacket 15.00, wedding gown 27.50. Express service adds a 50% surcharge to the ticket. An order the rate card cannot price returns exactly -1.0 and never raises. Keep it a pure function: no printing, no files, no network. Graders call it directly with ordinary tickets and adversarial ones and compare the returned float, so every input path needs one defined answer.",
+  "entry_contract": "Implement price_order(items, express) taking items as a list of (garment_type, quantity) pairs - garment_type a lowercase string exactly as printed on the rate card, quantity a positive int - and express as a bool, returning a float dollar total for every input, with -1.0 as the defined cannot-price value in place of any exception.",
+  "hidden_spec": [
+    { "id": "R1", "rule": "A plain ticket is nothing but rate-card arithmetic: each line is quantity times the card price and the total is the sum of the lines, with no house rule touching it." },
+    { "id": "R2", "rule": "Household linens (bedsheet, pillowcase, duvet, tablecloth - any mix) run as a five-piece bundle: every complete group of five linen pieces prices as one flat 18.00 line instead of per-piece, with each group filling from the ticket's linen pieces in the order they appear, and pieces beyond each complete group going back on the ticket individually at the card price." },
+    { "id": "R3", "rule": "A ticket carrying 12 or more garments in total - every piece counts, street clothes, linens, and specialty alike - takes 10% off its garment subtotal, figured after linen bundles are substituted and before any express surcharge." },
+    { "id": "R4", "rule": "Leather jacket and wedding gown never take the express surcharge: the 50% lands only on the express-eligible rest of the ticket, and the two specialty garments always ride at their full card price." },
+    { "id": "R5", "rule": "Every ticket carries a 10.00 minimum: a ticket that totals under 10.00 after the volume break and any express surcharge rings at exactly 10.00." },
+    { "id": "R6", "rule": "The ticket total is the only rounded figure: it rounds to the nearest cent with ties resolved upward (20.625 posts as 20.63), every line underneath staying exact until that final rounding." },
+    { "id": "R7", "rule": "A ticket the shop cannot price returns exactly -1.0 and never raises: a garment type not on the rate card, a garment type that is not a string, a quantity that is not an int, or a quantity below 1 all bounce, and booleans do not count as ints." }
+  ],
+  "answer_sheet": [
+    { "id": "R1", "topic": "rate card math", "answer": "Straight off the printed card - quantity times price, add up the lines. No house rule touches a plain ticket, so what the card says is what the register rings." },
+    { "id": "R2", "topic": "linens bundle", "answer": "Household linens go out as our five-piece bundle: any mix of bedsheets, pillowcases, duvets, and tablecloths, five pieces for 18.00 flat. Piece six prices on its own at the card rate." },
+    { "id": "R3", "topic": "volume break", "answer": "A dozen pieces on one ticket earns 10% off the garment subtotal. Eleven pieces gets you nothing; twelve flips it. Every piece counts, gown and all." },
+    { "id": "R4", "topic": "express exclusion", "answer": "Rush service never touches leather or bridal - those two go to the specialist anyway. The gown and the jacket ride at full card price, and the 50% lands on everything else on the ticket." },
+    { "id": "R5", "topic": "minimum charge", "answer": "Ten-dollar floor per ticket. A 6.00 tie-and-shirt drop still rings ten - the counter and the press have to get paid." },
+    { "id": "R6", "topic": "rounding", "answer": "One rounding per ticket, at the very end, to the cent, ties up - 20.625 posts as 20.63. Everything underneath stays exact until that last snap." },
+    { "id": "R7", "topic": "bad ticket", "answer": "A ticket we can't price comes back -1.0, never a crash: garment not on the card, a count of zero, half a shirt, or a boolean playing a count. Counter staff quotes those by hand." },
+    { "id": "X1", "topic": "sales tax", "answer": "Out of scope - no tax math here; the register adds sales tax after our quote comes back." },
+    { "id": "X2", "topic": "loyalty and coupons", "answer": "Out of scope - no house accounts, punch cards, or coupon codes; one ticket in, one total out." }
+  ],
+  "tests_file": "tests-37-dryclean-order.py",
+  "reference_solution": "ref-37-dryclean-order.py",
+  "max_score": 10,
+  "provenance": {
+    "authored_by": "model-assisted, council-design-blind",
+    "derivation": "Rules derived from mainstream dry-cleaning counter conventions (a published per-garment rate card, a same-day express upcharge, a per-order minimum ticket, the five-piece household-linen bundle, a dozen-piece volume break, leather and bridal excluded from rush service, and cash-drawer cent rounding), not from any WiseCounsil design document."
+  }
+}

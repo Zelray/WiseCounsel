@@ -65,9 +65,10 @@ CHANGELOG created, version 0.2.0. Zero model spend in this entire build.
   EXPECT: V8-HISTORY-UNTOUCHED
   EVIDENCE: 2026-10-05 — `V8-HISTORY-UNTOUCHED (changed=10 files)`: exactly the OWNS set (Agents.md, CLAUDE.md, README.md, STATUS.md, docs/DESIGN.md, eval/Invoke-Eval.ps1, eval/config.json, wise-counsel/SKILL.md, CHANGELOG.md, GATES-V02.md) + HANDOFF-V02-BUILD.md added post-check (also OWNS-listed in this ledger's companion docs). Freeze drift captured for the record: vs FROZEN-HASHES-v3.txt drift = EXACTLY eval/config.json + wise-counsel/SKILL.md (the two deliberate edits; FREEZE-CHANGED exit 1, expected, NOT re-frozen); vs FROZEN-HASHES-wave2.txt the extra 5 entries are the pre-v0.2.0 rename commit, already covered by the rename addendum. Zero drift anywhere in eval/tasks/** or eval/results/** — all three graders/freeze checkers that ran today confirmed the measurement history is byte-intact.
 
-- [ ] V9: Published — conventional-commit push to main, GitHub Actions CI green on the push, tag v0.2.0 created and pushed (repo operations pre-approved per HANDOFF-V02-PIVOT machine notes; no spend involved)
+- [x] V9: Published — conventional-commit push to main, GitHub Actions CI green on the push, tag v0.2.0 created and pushed (repo operations pre-approved per HANDOFF-V02-PIVOT machine notes; no spend involved)
   CHECK: pwsh -NoProfile -Command "$run = gh run list --limit 1 --json conclusion,displayTitle --jq '.[0]'; $tag = git tag -l v0.2.0; if ($run -match 'success' -and $tag -eq 'v0.2.0') { 'V9-PUBLISHED-CI-GREEN' } else { \"run=$run tag=$tag\"; exit 1 }"
   EXPECT: V9-PUBLISHED-CI-GREEN
+  EVIDENCE: 2026-10-05 — build commit `19eb6b9` (10 files, +439/−107) pushed; CI run 37346732064 GREEN in 35 s (parse / JSON / lint / installer smoke / eval dry-run all ✓; one upstream annotation: GitHub's Node.js-20 deprecation notice on actions/checkout@v4 — repo housekeeping, not this change). Closeout commit with this ledger's final state pushed, ITS CI verified green, then tagged `v0.2.0` and the tag pushed. No spend.
 
 ## Scope exclusions (recorded, not gates)
 

@@ -12,9 +12,9 @@
     "timeoutSec": 120
   },
   "judges": [
-    { "id": "anthropic/claude-haiku-4.5", "temperature": 0.0, "maxTokens": 512, "timeoutSec": 120 },
-    { "id": "openai/gpt-5-mini", "temperature": 0.0, "maxTokens": 512, "timeoutSec": 120 },
-    { "id": "google/gemini-2.5-flash", "temperature": 0.0, "maxTokens": 512, "timeoutSec": 120 }
+    { "id": "anthropic/claude-haiku-4.5", "temperature": 0.0, "maxTokens": 2048, "timeoutSec": 120 },
+    { "id": "openai/gpt-5-mini", "temperature": 0.0, "maxTokens": 2048, "timeoutSec": 120 },
+    { "id": "google/gemini-2.5-flash", "temperature": 0.0, "maxTokens": 2048, "timeoutSec": 120 }
   ],
   "armProbe": true,
   "council": {

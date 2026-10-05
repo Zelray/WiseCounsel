@@ -123,9 +123,15 @@ function Invoke-ModelCall {
       'X-Title'     = 'WiseCounsel-Eval'
     } -ContentType 'application/json; charset=utf-8' -Body $body -TimeoutSec $TimeoutSec
     if ($RunDir) {
+      # judge/probe fire once per judge inside one run dir; suffix the sanitized
+      # model id so each judge's raw request/response stays inspectable instead
+      # of overwriting the same file. Single-call purposes keep the plain
+      # Purpose name (arm F disambiguates its builds via -PurposeSuffix).
+      $safeModel = $Model -replace '[^A-Za-z0-9._-]', '-'
+      $stem = if (@('judge','probe') -contains $Purpose) { "$Purpose-$safeModel" } else { $Purpose }
       @{ purpose = $Purpose; model = $Model; body = $bodyObj } |
-        ConvertTo-Json -Depth 8 | Set-Content (Join-Path $RunDir "prompts\$Purpose.json") -Encoding UTF8
-      $resp | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $RunDir "responses\$Purpose.json") -Encoding UTF8
+        ConvertTo-Json -Depth 8 | Set-Content (Join-Path $RunDir "prompts\$stem.json") -Encoding UTF8
+      $resp | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $RunDir "responses\$stem.json") -Encoding UTF8
     }
     $cost = 0.0; if ($resp.usage.cost) { $cost = [double]$resp.usage.cost }
     $script:Spend += $cost
@@ -396,6 +402,7 @@ function Invoke-JudgeTrack2 {
   $rubricText = (@($Card.rubric) | ForEach-Object { "- $($_.id) ($($_.name)): $($_.description) [0-2]" }) -join "`n"
   $sys = @"
 You are scoring one response to a decision brief. Score ONLY the substance against the rubric; do not reward length or style. Respond ONLY with JSON: {"<dim-id>": <0-2>, ..., "total": <sum>, "one_line": "<why>"}
+Output ONLY the JSON object. No markdown fences, no commentary, no text before or after the JSON.
 RUBRIC:
 $rubricText
 "@

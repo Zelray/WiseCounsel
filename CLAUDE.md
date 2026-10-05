@@ -4,9 +4,11 @@
 project** (structure, prime directives, testing rules, safety rules, known
 constraints). Everything in `Agents.md` applies to Claude sessions.
 
-Project in one line: WiseCounsel is an agent skill that convenes a council of
-2–6 cheap/free models (OpenRouter / OpenCodeGo) to attack a task brief before
-the frontier model starts work.
+Project in one line: WiseCounsel is an agent skill whose DEFAULT `clarify`
+mode has the frontier model itself generate ≤5 build-changing questions, ask
+the user, and build against an enriched brief ($0 — the measured +13.2 pp
+scaffold); the 2–6 cheap/free-model council (OpenRouter / OpenCodeGo) is
+opt-in, only on "convene the council".
 
 Claude Code specifics:
 - Skill installs to `~/.claude/skills/wise-counsel/` via

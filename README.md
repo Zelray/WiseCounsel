@@ -1,19 +1,24 @@
 # WiseCounsel
 
-**A council of cheap AI models that reads your prompt before your frontier
-model does — and makes the frontier model's first try the right one.**
+**Before a big task, WiseCounsel makes your frontier model stop and ask you
+the questions that change what it builds — then build against your answers.**
 
-Six cheap or free models fire **in parallel** and *attack* your task brief —
-surfacing missing rules, ambiguities, and risky assumptions — before your
-frontier model writes a line of code. You answer a handful of build-changing
-questions; the frontier model gets an enriched brief instead of guessing in
-silence. A full council costs **~$0.003** and takes ~15–45 seconds.
+Say **"wise counsel"** and your frontier model generates up to 5
+build-changing questions about your brief, asks you, and merges your answers
+into an enriched brief with a verify-later checklist. That scaffold is the
+product, and the lift is measured, not asserted: **+13 points on
+first-attempt pass rate**, at **$0 extra cost**, with **no sub-models and no
+latency hit**.
 
 [![ci](https://github.com/Zelray/WiseCounsel/actions/workflows/ci.yml/badge.svg)](https://github.com/Zelray/WiseCounsel/actions/workflows/ci.yml)
 
-It also runs **debates** (six models take positions, then rebut each other
-anonymously) and **plan critiques** (cheap models attack your plan before you
-execute it).
+The multi-model council — 2–6 cheap or free models that fire **in parallel**
+and *attack* your brief, surfacing missing rules, ambiguities, and risky
+assumptions — is still here, but it is **opt-in**: say **"convene the
+council"** when you want that multi-model diversity anyway. A full council
+costs **~$0.003** and takes ~15–45 seconds. It also runs **debates** (six
+models take positions, then rebut each other anonymously) and **plan
+critiques** (cheap models attack your plan before you execute it).
 
 ## Evidence
 
@@ -29,8 +34,8 @@ billed, 2026-10-05):** the question-answer scaffold works — briefs enriched
 with answered open questions lifted the executor's first-attempt pass rate
 **+13.2 points** (44.8% → 58.0%, p = 0.0002) and beat compute-matched
 best-of-3-with-selection, which gained **exactly zero** over a single
-attempt. But the multi-model council itself — the part that makes
-WiseCounsel WiseCounsel — **did not earn its keep**: the confirmatory
+attempt. But the multi-model council itself — the part the project was
+originally built around — **did not earn its keep**: the confirmatory
 primary comparison (council vs the executor asking its own questions) came
 in at **B − C = −0.5 points (95% CI [−5.7, +4.5], p = 0.90)**, and a sham
 dossier built from a *different* task performed identically to the real
@@ -44,9 +49,12 @@ commitment made before the data existed.
 - **Grading:** deterministic unit tests authored from hidden specs, blind
   to the skill's design, calibrated to a 30–70% baseline band, and frozen
   (SHA-256) before any model call — not model opinion.
-- **Reproducibility:** raw transcripts for all 325 wave-2 runs ship in the
-  repo audit trail (`eval/results/`), and the whole pipeline runs offline
-  for zero dollars with `pwsh -File eval/Invoke-DryRunSmoke.ps1`.
+- **Reproducibility:** the result summaries ([docs/RESULTS.md](docs/RESULTS.md),
+  `eval/results/summary.md`, `eval/results/summary-t2.md`) and the run
+  manifest (`eval/results/manifest.jsonl`) are committed to the repo; raw
+  transcripts for all 325 wave-2 runs are retained locally but not committed
+  (they contain unredacted model traffic), and the whole pipeline runs
+  offline for zero dollars with `pwsh -File eval/Invoke-DryRunSmoke.ps1`.
 
 ## Why not just ask the model to think harder?
 
@@ -74,15 +82,22 @@ and copies the skill into `~\.config\opencode\skills\wise-counsel\` and
 
 ## Use
 
-Say **"wise counsel"** (or "council this") before a big task. Modes are
-picked automatically and can be forced: `premortem` (default for builds),
-`debate` (research/decision questions, 2 rounds), `critique` (attack an
-existing plan).
+Say **"wise counsel"** (or "council this") before a big task. That runs
+**`clarify`, the default mode**: your frontier model generates up to 5
+build-changing questions, asks you, and merges your answers into an enriched
+brief with a verify-later checklist — no sub-models, no API calls, no extra
+wall time.
+
+The council modes run **only on an explicit "convene the council"** (or when
+you name one directly): `premortem` (attack a build brief), `debate`
+(research/decision questions, 2 rounds), `critique` (attack an existing
+plan).
 
 ## Cost
 
-- `balanced-six` (default): **~$0.003 per council** — verified in the
-  2026-10-01 smoke test at $0.0015 for a two-member council.
+- `clarify` (default): **$0.00, no latency hit** — no sub-models are called.
+- `balanced-six` (default council preset): **~$0.003 per council** — verified
+  in the 2026-10-01 smoke test at $0.0015 for a two-member council.
 - `free-six`: **$0.00** (subject to your OpenRouter account's privacy
   settings; see Known Constraints in Agents.md).
 - OpenCodeGo users: flat-rate plan, so a council costs **$0 extra**.
@@ -103,6 +118,10 @@ replacing them. The full rationale — three failure modes and their
 mitigations, the synthesis split, the engineering decision log — lives in
 [docs/DESIGN.md](docs/DESIGN.md).
 
+**v0.2.0 pivot:** wave-2 measured the scaffold's lift as real and the
+council premium as null, so the design followed the data — `clarify` is now
+the default and the council is opt-in. That is the point of pre-registering.
+
 ## Honest limits
 
 Cheap models hallucinate confidently; WiseCounsel's mitigations (attack-don't-
@@ -116,10 +135,10 @@ commitment to publish whatever the data says.
 
 ## Roadmap
 
-1. **Pilot eval run** — execute the pre-registered pilot (gated on the $6
-   budget cap; see docs/EVAL-DESIGN.md).
-2. **Wave-2 confirmatory run** — 30 calibrated tasks, plus the
-   compute-matched baseline and sham-context arms the literature expects.
-3. **OpenCodeGo native door** — subagent definitions pinned to OpenCodeGo
+1. **Track-2 judge re-run** — pending the owner's go-ahead. The judge
+   plumbing was fixed in v0.2.0, and a small (<$0.50) re-run would validate
+   Track 2; it needs explicit approval plus a pre-registration addendum
+   first, so it is **not** committed to here.
+2. **OpenCodeGo native door** — subagent definitions pinned to OpenCodeGo
    models so councils ride the flat-rate plan inside OpenCode.
-4. **Web app** — the plus-button model manager. Deliberately phase 2.
+3. **Web app** — the plus-button model manager. Deliberately phase 2.

@@ -7,16 +7,26 @@ this file for Claude Code sessions.
 ## What this project is
 
 **WiseCounsel** is a harness-native skill: before a frontier model starts a
-big task, it convenes a council of 2–6 cheap/free models (OpenRouter or
-OpenCodeGo) that *attack the user's prompt* — surfacing gaps, ambiguities,
-risky assumptions, and approach sketches. Their findings are merged into an
-enriched brief (open questions + verify-later checklist) that the frontier
-model then executes against.
+big task, it runs the **clarify scaffold** (the DEFAULT, $0): the frontier
+model generates at most 5 build-changing questions about the brief, asks the
+user, and merges the answers into an enriched brief (open questions +
+verify-later checklist) that it then executes against. The wave-2
+confirmatory eval measured this scaffold at **+13.2 pp** first-attempt pass
+rate (p = 0.0002) and refuted the council premium (B − C = −0.5 pp, p =
+0.90) — see `docs/RESULTS.md`.
 
-Core design principle: **cheap models attack, frontier model decides.**
-Council members never produce final answers; their claims are always
-candidates to verify. See `docs/DESIGN.md` for the full rationale and
-`wise-counsel/SKILL.md` for the operating protocol.
+Optionally — **only when the user explicitly says "convene the council"** —
+it convenes a council of 2–6 cheap/free models (OpenRouter or OpenCodeGo)
+that *attack the user's prompt* — surfacing gaps, ambiguities, risky
+assumptions, and approach sketches — and merges their findings the same way.
+The council is kept for untested task classes and users who want the
+diversity; it is never the default.
+
+Core design principle: **questions before building; cheap models attack,
+frontier model decides.** Council members never produce final answers; their
+claims are always candidates to verify. See `docs/DESIGN.md` for the full
+rationale (including "what wave 2 taught us") and `wise-counsel/SKILL.md`
+for the operating protocol.
 
 ## Structure map
 
@@ -52,8 +62,10 @@ installed copy directly for quick experiments.
 3. **Additive brief** — the enriched brief extends the user's prompt; user's
    words win any conflict.
 4. **Attribution always** — model tags survive merging; no anonymous consensus.
-5. **Opt-in only** — the skill must never make itself always-on; rosters are
-   hard-capped at 6 members.
+5. **Opt-in tiering** — `clarify` (self-generated questions, $0) is the
+   default; the multi-model council runs only on an explicit "convene the
+   council" from the user. The skill must never make itself always-on;
+   rosters are hard-capped at 6 members.
 
 ## How to modify things
 
@@ -91,7 +103,7 @@ installed copy directly for quick experiments.
   inside the scripts. Parallel round 1 uses `ForEach-Object -Parallel`
   (ThrottleLimit 6). Debate round 2 is intentionally sequential.
 
-## Known constraints (as of v0.1.0)
+## Known constraints (as of v0.2.0)
 
 - **ZDR privacy setting**: Mike's OpenRouter account excludes endpoints that
   don't meet its data policy — several `:free` endpoints 404 with

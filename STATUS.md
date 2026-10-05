@@ -21,14 +21,14 @@
 | Eval design (docs/EVAL-DESIGN.md, pre-registered: arms, grading, stats, $6 cap) | ✅ written 2026-10-01, debate-tested (skeptic/builder/architect/prior-art) |
 | Eval harness (eval/: run + judge + analyze + $0 dry-run smoke) | ✅ all gates green (G1–G6), 10 scripts parse, 32-run offline smoke passed |
 | Pilot task suite (6 hidden-spec + 2 decision tasks, frozen checkers) | ✅ 33-file SHA-256 freeze intact |
-| Pilot eval run — G7 approved by Mike | ✅ RAN 2026-10-01: 56 runs, **$0.61 total** (cap $6) — Track 1: **B−A = +15.8 pp** (CI [3.3, 35.8], p=0.125, n=6 — signal, NOT confirmed); question-overlap 21.6%; full read in docs/RESULTS.md |
-| Wave-2 confirmatory run (30 calibrated tasks, arms E+F, hardened parser) | ⬜ owner decision on ~$2–5 spend — prereg scale-gate did not fire by its letter (p=0.125 > 0.10) |
-| Public-repo readiness (LICENSE, CI, README Evidence, .gitignore hygiene) | ✅ done — badge URLs need OWNER/REPO at push |
-| Initial commit / GitHub repo | 🟡 committed on `main` (3e273b2); repo creation + push = Mike's call |
+| Pilot eval run — G7 approved by Mike | ✅ RAN 2026-10-01: 56 runs, $0.61 total — B−A = +15.8 pp (p=0.125, n=6). **Superseded by wave 2** per prereg; numbers kept as history |
+| Wave-2 confirmatory run — G7 approved by Mike | ✅ RAN 2026-10-05: 325 runs, **$2.21 billed** (cap $8; itemized $1.92, log counter superseded) — **primary B−C = −0.5 pp, p=0.90: NULL — council premium refuted at n=30**; scaffold lift B−A = +13.2 pp (p=0.0002) confirmed; sham dossier ≈ real dossier; best-of-3 = zero gain. Track 2 unreliable (67% judge nulls, mechanical). Full read: docs/RESULTS.md |
+| Public-repo readiness (LICENSE, CI, README Evidence, .gitignore hygiene) | ✅ done — README Evidence carries wave-2 verdict; lint settings fixed (psd1 data contract); badge URLs need OWNER/REPO at push |
+| Initial commit / GitHub repo | 🟡 committed on `main` (341504b wave-2 verdict); repo creation + push = Mike's call |
 | Engine `-OutDir` default writes inside the package (wise-counsil/runs/) | 🟡 known; gitignored (unanchored `runs/` rule); fix scheduled AFTER the eval — package is the frozen measured artifact |
 
 ## Next steps
-1. **Wave 2 (confirmatory run)** — ⏭️ **START HERE in a fresh session: read `HANDOFF-WAVE2.md`** (exhaustive instructions: prep, 24+3 new tasks, arms E+F, freeze v2, launch commands, analysis, publish steps). Owner decision on ~$2.50–4.00 spend happens inside that flow.
-2. Create the GitHub repo (Mike's account) and push; fix README badge URLs. *(§6 of HANDOFF-WAVE2 — after the wave-2 verdict.)*
+1. **Owner decision: publish or not** — the wave-2 verdict is committed (null council premium, confirmed scaffold lift, honest caveats). §6 of HANDOFF-WAVE2: repo name, visibility, and Mike's acceptance of the published result whatever it says — then `gh repo create`, badge URLs, CI-green check, tag v0.1.0.
+2. **Product pivot options from the verdict** (Mike's call): ship the question-answer scaffold with self-questions as default (council = opt-in), and/or fix Track 2's judge layer (67% null output — JSON-only instruction, larger max_tokens, structured output) and test the diversity premise on decision/research briefs where it might actually matter.
 3. Exercise `debate` mode end-to-end.
 4. Build + test Door B (OpenCodeGo subagents) inside OpenCode.

@@ -1,103 +1,160 @@
-# Results — Pilot (2026-10-01)
+# Results — Wave 2 confirmatory run (2026-10-05)
 
 > Pre-registered protocol: [EVAL-DESIGN.md](EVAL-DESIGN.md), committed at
-> `3e273b2` before any data was collected. Machine-generated tables:
-> `eval/results/summary.md` (Track 1) and `summary-t2.md` (Track 2); raw
-> transcripts for every run under `eval/results/raw/`. Nothing on this page is
-> hand-typed except interpretation.
+> `3e273b2` before any data was collected; wave-2 scope, arms, budget, and
+> decision rules appended as a dated addendum at `3097b0a`, also before any
+> wave-2 model call. Machine-generated tables: `eval/results/summary.md`
+> (Track 1, confirmatory) and `summary-t2.md` (Track 2); raw transcripts for
+> every run under `eval/results/raw/`. Nothing on this page is hand-typed
+> except interpretation. Per the pre-registered honesty commitment, the null
+> primary result below is published exactly as a positive one would be.
 
 ## Headline
 
-**In the pre-registered pilot, the council-enriched pipeline improved
-first-attempt pass rate on hidden-spec coding tasks by a mean +15.8 points
-(24.2% → 40.0%), for ~$0.005 extra and ~40 s per task. The improvement is
-NOT a confirmed finding at the pre-registered bar** — 6 tasks is too few
-(p = 0.125; the protocol required p < 0.05). It is a promising, honestly
-bounded signal, plus real mechanistic support for the diversity premise:
+**Wave 2 (300 Track-1 runs, 30 calibrated tasks, 5 arms) tested the
+mechanism claim — H2, "the council's questions beat the executor's own
+questions" — and it is null. The confirmatory primary comparison came in at
+B − C = −0.5 points (95% CI [−5.7, +4.5], p = 0.90, n = 30).** The
+pre-registered decision rule — "council earns its keep" = B − C ≥ +5 pp AND
+p < 0.05 AND bootstrap CI excludes 0 — **fails on all three conditions**.
 
-- **Council questions were materially different questions.** Mean token
-  overlap between the council's questions and the executor's own: **21.6%**
-  — the council surfaced content the executor did not ask itself about.
-- **The council ran 12/12 without a single failure** (all 6 members, every
-  task), and its full pipeline cost was ~$0.005/task.
+What the same run did establish, at the strongest significance this project
+has produced: **structured pre-build questions with delivered answers lift
+the executor's first-attempt pass rate by ~13 points over the baseline**
+(44.8% → 58.0–58.5%, p = 0.0002–0.0011) — but *whose* questions and *what*
+extra context those are turns out not to matter:
+
+- The executor's **own** questions, matched and answered exactly like the
+  council's (arm C), deliver the same lift: C − A = **+13.7 pp** (p = 0.0011).
+- A **sham dossier** — a real council run on a *different* task, fed in
+  place of the true one (arm E) — performs identically to the genuine
+  article: E − A = +13.7 pp (p = 0.0062), B − E = −0.5 pp (p = 0.94).
+- **Compute-matched best-of-3 with selection (arm F) bought nothing at
+  all**: F − A = 0.0 pp (p = 1.0) at 4× the executor calls. The "you just
+  bought the gain with tokens" objection dies from the other direction —
+  the gain is not purchasable with plain executor compute.
+
+The pilot's own falsification criterion — "if a powered run shows
+C − A ≈ B − A, then councils are an expensive way to say 'ask clarifying
+questions,' and this repo will say so" — is met. The value is in the
+question-answer scaffold (forcing the unknowns into the open and answering
+them before the build), not in six cheap models picking the questions. The
+diversity premise survives only as trivia: council and self questions
+overlap just 23.9% (they really do ask different things) while scoring
+identically — *different questions, same value*.
 
 ## Track 1 — hidden-spec coding tasks (primary, pre-registered)
 
-Executor: `google/gemini-2.5-flash`, single-shot, temp 0. 6 tasks × 4 arms
-× 2 reps = 48 runs. Score = fraction of hidden-rule unit tests passed.
+Executor: `google/gemini-2.5-flash`, single-shot, temp 0. 30 tasks (6 pilot
+re-run fresh + 24 new, every new task difficulty-calibrated into the 30–70%
+baseline band before the freeze — see `eval/tasks/CALIBRATION-wave2.md`)
+× 5 arms × 2 reps = 300 runs. Score = fraction of hidden-rule unit tests
+passed. Freeze manifest: `eval/FROZEN-HASHES-wave2.txt` (created before any
+wave-2 council/executor call).
 
-| Arm | Mean | Description | Cost/task |
+| Arm | Mean | Description | Itemized cost/run |
 |---|---|---|---|
-| A — baseline | 24.2% | brief alone | $0.002 |
-| B — council | 40.0% | shipping skill, questions answered | $0.007 |
-| C — self-questions | 35.8% | executor asks its own questions | $0.004 |
-| D — single critic | 41.7% | one cheap model's questions | $0.005 |
+| A — baseline | 44.8% | brief alone | $0.003 |
+| B — council | 58.0% | shipping skill premortem, questions answered | $0.006 |
+| C — self-questions | 58.5% | executor asks its own questions | $0.004 |
+| E — sham context | 58.5% | council dossier from the WRONG task | $0.006 |
+| F — compute-matched | 44.8% | best-of-3 + selection, no answers | $0.009 |
 
-Pre-registered paired comparisons (task-level deltas):
+Pre-registered comparisons (paired task-level deltas; **B − C is the
+confirmatory primary**, the rest the pre-stated hierarchy, nominal p):
 
 | Comparison | Δ (pp) | 95% CI | p (sign-flip) | Pre-registered verdict |
 |---|---|---|---|---|
-| **B − A** (primary) | **+15.8** | [3.3, 35.8] | 0.125 | **Not confirmed** (rule required p < 0.05; CI excluding 0 and Δ ≥ +5 both met) |
-| C − A | +11.7 | [−15.0, 42.5] | 0.625 | null — but same direction as B − A |
-| B − C (mechanism) | +4.2 | [−10.8, 20.8] | 0.750 | null at this n — council premium over self-questioning is not distinguishable |
-| D − B | +1.7 | [−4.2, 7.5] | 0.8125 | null — single critic ≈ full council on scores |
+| **B − C (primary)** | **−0.5** | [−5.7, +4.5] | **0.9007** | **NULL — decision rule fails (needed ≥ +5 pp, p < 0.05, CI excluding 0)** |
+| B − A | +13.2 | [7.0, 20.2] | 0.0002 | positive, survives — but not council-specific |
+| C − A | +13.7 | [6.2, 21.3] | 0.0011 | positive — self-questioning matches the council |
+| B − E | −0.5 | [−8.7, +8.0] | 0.9425 | null — dossier content contributes nothing |
+| B − F | +13.2 | [7.0, 20.2] | 0.0003 | positive vs compute-matched control |
+| E − A | +13.7 | [5.0, 22.2] | 0.0062 | positive — even a sham dossier carries the lift |
+| F − A | −0.0 | [−0.7, +0.8] | 1.0 | null — 4× compute, zero gain |
 
-**Reading this honestly:** much of the gain comes from *asking questions and
-getting answers at all* (arm C also improved +11.7 pp). The specifically
-council-flavored claim — that six cheap models pick better questions than the
-frontier model picks for itself — shows only +4.2 pp at a sample size this
-pilot was pre-declared unable to resolve. The wave-2 scale gate (Δ ≥ +10 and
-p < 0.10) did **not** fire by its letter (p = 0.125); scaling to a powered
-run is a fresh spend decision, not an automatic continuation.
+**Verdict, applied verbatim from the pre-registration:** H1-family claim
+(structured question-answering helps) **confirmed, p = 0.0002**. H2 (the
+council's question *selection* is the active ingredient) **refuted at n =
+30** — the council premium over self-questioning is −0.5 pp with a CI that
+rules out any council advantage larger than +4.5 pp.
 
-### Known artifact, disclosed
+### Known artifacts, disclosed
 
-Two baseline runs (username-validator, both reps) scored 0 on a **harness
-extraction bug**: the executor omitted its closing code fence, the fallback
-saved an unparsable file, and the grader failed. Per the pre-registered
-no-exclusions rule these zeros stand in the official numbers — and readers
-should note the artifact *favors* the council comparison (it penalized arm A
-on one of six tasks; the same task's B/C/D runs extracted cleanly). The
-parser is hardened before any wave-2 run. This is exactly the kind of wart
-pre-registration exists to force into the open.
+- **Four zeroed runs (0.7% of 600), all on one task (username-validator),
+  arms A and F, both reps:** the baseline/best-of-3 executor emitted
+  syntactically broken Python (`SyntaxError: '{' was never closed`), the
+  grader correctly failed the file, and the run scored 0. Per the
+  pre-registered no-exclusions rule these zeros stand in the official
+  numbers; they mechanically favor B over A/F on that task. Labeled
+  post-hoc sensitivity check (NOT part of the confirmatory table):
+  excluding that task entirely, B − A = +10.9 pp and **B − C = −0.5 pp,
+  still null** (n = 29). No verdict changes.
+- **Cost accounting, three numbers, honestly:** the manifest's itemized
+  per-run costs sum to **$1.92** for all 325 runs (per-run entries verified
+  against their parts); OpenRouter's authoritative key-usage delta for the
+  whole wave-2 day (calibration + both tracks) is **$2.27**; the launch
+  log's running counter printed **$3.95** and is superseded — a harness
+  accounting quirk (council-internal calls and intermittent provider
+  cost fields are not fully itemized per run). The ~13% itemization gap
+  does not touch per-arm *ratios*, which is what the cost discussion uses.
+  Absolute claim to trust: **the whole confirmatory run cost about $2.21
+  in provider billing**, inside the $2.50–4.00 estimate and far under the
+  $8.00 hard cap.
 
 ### Integrity checks (all pre-registered)
 
-- **Leakage:** all 12 baseline prompts vs answer sheet: max overlap 0.148
-  (threshold 0.4) — the answer sheet never leaked into the baseline.
-- **Council reliability:** 12/12 councils returned full rosters; zero
-  re-rolls (per the no-survivorship rule).
-- **Judge arm-detectability probe:** judges answered "enriched" for every
-  output regardless of arm — a constant response: no detectable arm bias,
-  but the probe is uninformative as designed and Track 2 stays secondary.
+- **Leakage:** all 60 baseline prompts vs answer sheets: verdict OK on
+  every run (threshold 0.4 overlap).
+- **Council reliability:** 60/60 Track-1 councils (and 5/5 Track-2)
+  returned successfully; zero re-rolls, per the no-survivorship rule.
+- **Diversity audit:** mean B-vs-C question-token overlap (Jaccard) =
+  **23.9%** — the council asks genuinely different questions than the
+  executor asks itself. In the pilot this was read as mechanistic support
+  for the product; wave 2 shows different questions scoring identically,
+  so diversity of questioning does not translate into value at this
+  task class.
+- **Arm-detectability probe:** constant (24/25 runs got exactly 2-of-3
+  "enriched" votes across ALL arms including the un-enriched baseline).
+  Interpreted per protocol as uninformative, not as blindness.
 
-## Track 2 — decision tasks (secondary)
+## Track 2 — decision tasks (secondary) — UNRELIABLE, not evidence
 
-2 tasks × 4 arms, judged by a 3-judge panel (claude-haiku-4.5, gpt-5-mini,
-gemini-2.5-flash), rubric 6×0–2. **Uninformative at this size:** one task
-(storage ADR) hit the ceiling — every arm scored 1.0 — and the payment task
-n=2 CIs span ±25 pp. Council arm trended *lower* than baseline (−12.5 pp)
-but this is noise on two tasks and should not be read as either harm or
-help. Lesson recorded: wave 2 needs harder, non-ceiling decision tasks.
+4 new harder decision tasks + payment-processor kept, 3-judge panel as
+pre-registered. **The panel mechanically failed: 50 of 75 judge slots
+(67%) returned unparseable output** (two of the three judge models —
+claude-haiku-4.5 and gpt-5-mini — failed to emit parseable JSON on most
+runs; only the gemini judge scored reliably, and each judge's response
+overwrites the same log so the failures cannot be inspected post-hoc).
+Headline scores are therefore mostly single-judge means near ceiling
+(A = 0.80, B = 1.0, C = 0.85, E = 0.95, F = 0.80 of max), B − C = +15 pp
+at p = 0.25 on n = 5, and the pre-registered reliability bar (panel
+agreement, detectability) is not met. **Track 2 is reported as
+unreliable and carries no evidentiary weight this wave.** Root cause is
+diagnosed and fixable (stronger JSON-only instruction, larger
+max_tokens, or structured output mode) — recorded for a future wave.
 
-## Diversity audit
+## What this means for the product
 
-The pre-registered question-overlap audit came back at **21.6% (Track 1)**:
-~78% of the council's question content was not duplicated by the executor's
-own questions. This is the pilot's strongest piece of evidence *for* the
-product's core premise — differently-trained families surface different
-gaps — and it is independent of the noisy score comparison.
+The shipping skill's premortem council, as measured, adds nothing over
+asking the executor to enumerate its own questions — but the *scaffold
+around* the council (surface the open questions, answer them from an
+answer sheet, build once with the answers) is worth ~+13 points and beats
+spending 4× the compute on best-of-3 selection. Honest framing: WiseCounsil
+the scaffold works; WiseCounsil the multi-model council is, on this task
+class, undifferentiated from a mirror. Owner decisions that follow —
+(e.g. ship the scaffold with self-questions as the default and the council
+as an opt-in; or target task classes where diversity might matter, like
+the research/decision briefs Track 2 was meant to test once its judges
+work) — are product calls, not eval calls.
 
-## What would falsify the thesis
+## Pilot (2026-10-01) — history
 
-If a powered run shows B − A ≈ 0 with C − A ≈ B − A, then councils are an
-expensive way to say "ask clarifying questions," and this repo will say so.
-
-## Next step (owner decision, new spend)
-
-Wave 2 per the pre-registration: ~30 calibrated tasks (incl. fixing the
-ceiling Track-2 task), hardened parser, arms A/B/C/D (+E sham-context,
-+F compute-matched for the literature-grade claim). Estimated ~$2–5 total
-on the same key, ~2–4 h wall clock. The pilot's job — proving the harness
-and sizing the effect — is done; the confirmatory run is what the Evidence
-section can cite.
+The pilot (6 tasks × 4 arms × 2 reps + 2 decision tasks, $0.61 total, 56
+runs) found B − A = +15.8 pp (p = 0.125, not confirmed at its bar),
+question-overlap 21.6%, and 12/12 council reliability. Its full writeup is
+preserved in git history (this file at commit `00d961b`) and its numbers
+are superseded by wave 2 per the pre-registered supersession clause: the
+pilot's 6 Track-1 tasks were re-run fresh inside wave 2 with the same
+hidden tests. Pilot-era artifacts: `eval/FROZEN-HASHES.txt` (historical
+freeze), `summary-t2.md` (wave-2 Track 2).

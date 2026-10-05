@@ -49,17 +49,17 @@ as a positive), with the pilot freeze and pilot numbers preserved as history.
   EVIDENCE: 2026-10-05 — `FREEZE-CREATED (133 files)` then `FREEZE-INTACT (133 files match the pre-registration freeze)` for eval/FROZEN-HASHES-wave2.txt, created after suite finalization and before any wave-2 council/executor/judge call (only pre-registered control-arm calibration calls preceded it). Pilot manifest FROZEN-HASHES.txt untouched on disk (historical record; per the wave-2 addendum it no longer matches the tree by design — the wave-2 manifest is the live oracle).
 
 - [ ] W7: MANUAL — Mike explicitly approves the wave-2 spend (final estimate presented: expected $2.50–4.00, hard cap $8.00) BEFORE launch; launch commands exactly per HANDOFF-WAVE2 §4 with -MaxSpendUsd 8, logged, 2-minute sanity check performed and documented
-  EVIDENCE: pending
+  EVIDENCE: 2026-10-05 — Mike approved via explicit prompt response ("Go — launch both tracks") after being presented: staged suite + freeze v2, expected $2.50-4.00 / cap $8.00, key balance $14.77, all model IDs live, wall clock ~2-3 h. Pre-launch spend to that point: ~$0.09 (calibration only). Launch per HANDOFF-WAVE2 §4 commands, logged to eval/results/wave2-launch.log. Sanity check at ~2 min: see below.
 
 - [ ] W8: Confirmatory analysis produced for both tracks — T1 summary is the B−C-primary confirmatory table with the full pre-registered comparison hierarchy; T2 summary saved as summary-t2.md; integrity probes reported (leak-check verdicts, council success rate, arm-probe interpretation)
   CHECK: pwsh -NoProfile -Command "$s1 = Get-Content 'eval/results/summary.md' -Raw; $s2 = Get-Content 'eval/results/summary-t2.md' -Raw; $need = @('B - C','B - A','C - A','B - E','B - F','E - A','F - A'); $miss = @($need | Where-Object { $s1 -notmatch [regex]::Escape($_) }); if ($miss.Count -eq 0 -and $s2 -match 'B - C') { 'ANALYSIS-OK' } else { \"MISSING: $($miss -join ',')\"; exit 1 }"
   EXPECT: ANALYSIS-OK
-  EVIDENCE: pending
+  EVIDENCE: 2026-10-05 — `ANALYSIS-OK`. summary.md regenerated LAST for the T1 confirmatory expid (exp-20261005-091132, 300 runs); summary-t2.md saved for T2 (25 runs) per the pilot lesson. Integrity probes: leak verdicts OK on all 60 baseline runs; council 60/60 + 5/5 success; arm-probe constant (24/25 runs = 2-of-3 enriched votes across all arms incl. baseline) → uninformative per protocol; Track 2 judged UNRELIABLE (50/75 judge slots null — two judge models failed parseable JSON on most runs; near-ceiling single-judge means).
 
 - [ ] W9: Honest writeup committed — docs/RESULTS.md leads with wave-2 tables and applies the pre-registered decision rules VERBATIM (a null/negative B−C is stated as a null/negative result, not spun); README Evidence section updated with confirmatory numbers; STATUS.md chart rows current
   CHECK: pwsh -NoProfile -Command "$r = Get-Content 'docs/RESULTS.md' -Raw; if ($r -match 'Wave 2' -and $r -match 'B − C|B - C' -and $r -match 'decision rule|Decision rule|verdict') { 'RESULTS-WAVE2-OK' } else { 'RESULTS-INCOMPLETE'; exit 1 }"
   EXPECT: RESULTS-WAVE2-OK
-  EVIDENCE: pending
+  EVIDENCE: 2026-10-05 — `RESULTS-WAVE2-OK`. docs/RESULTS.md leads with the wave-2 confirmatory tables; the pre-registered decision rule applied VERBATIM: B−C = −0.5 pp [−5.7, +4.5] p=0.90 → "council earns its keep" FAILS all three conditions — published as a null. Scaffold lift B−A = +13.2 pp (p=0.0002) confirmed but not council-specific (C−A +13.7, E−A +13.7 sham, F−A 0.0). Artifacts disclosed: 4 zeroed runs (0.7%, broken baseline syntax on one task, arms A/F) with a labeled sensitivity check (B−C still −0.5, B−A still +10.9 excluding it); three-way cost accounting (manifest $1.92 itemized / $2.27 authoritative / log $3.95 superseded). README Evidence + STATUS.md chart updated; pilot preserved as history.
 
 - [ ] W10: MANUAL — before any publish action (repo creation, push, tag): Mike confirms repo name, public visibility, and that he accepts the published result whatever it says
   EVIDENCE: pending

@@ -20,29 +20,33 @@ execute it).
 WiseCounsil's improvement claim is tested, not asserted. The full
 pre-registered protocol — hypotheses, arms, grading, statistics, and a hard
 budget — was committed to this repo **before** any evaluation data was
-collected ([docs/EVAL-DESIGN.md](docs/EVAL-DESIGN.md)), and the pilot ran
-under it. Full numbers and caveats: [docs/RESULTS.md](docs/RESULTS.md).
+collected ([docs/EVAL-DESIGN.md](docs/EVAL-DESIGN.md)), and both the pilot
+and the wave-2 confirmatory run executed under it. Full numbers and
+caveats: [docs/RESULTS.md](docs/RESULTS.md).
 
-**Pilot result (48 runs, $0.24, hidden-spec coding tasks):** council-enriched
-briefs improved the executor's first-attempt pass rate by a mean **+15.8
-points** (24.2% → 40.0%) at ~$0.005 extra per task — **a promising signal,
-not yet a confirmed finding** (95% CI [3.3, 35.8], p = 0.125 on 6 tasks; the
-pre-registered confirmatory bar was p < 0.05). The strongest mechanistic
-finding: the council's questions overlapped only **21.6%** with the
-questions the frontier model asked itself — differently-trained families
-really do surface different gaps. The self-questions control also improved
-(+11.7 pp), so the council's *unique* premium (+4.2 pp) is not yet
-distinguishable from noise at this scale. A null or negative wave-2 result
-will be published here exactly as a positive one would be.
+**Wave-2 confirmatory result (300 runs, 30 calibrated tasks, 5 arms, ~$2.21
+billed, 2026-10-05):** the question-answer scaffold works — briefs enriched
+with answered open questions lifted the executor's first-attempt pass rate
+**+13.2 points** (44.8% → 58.0%, p = 0.0002) and beat compute-matched
+best-of-3-with-selection, which gained **exactly zero** over a single
+attempt. But the multi-model council itself — the part that makes
+WiseCounsil WiseCounsil — **did not earn its keep**: the confirmatory
+primary comparison (council vs the executor asking its own questions) came
+in at **B − C = −0.5 points (95% CI [−5.7, +4.5], p = 0.90)**, and a sham
+dossier built from a *different* task performed identically to the real
+one. Per the pre-registered decision rule this is a **null on the council
+premium**, published here exactly as a positive would be, per the
+commitment made before the data existed.
 
 - **Arms:** baseline (brief alone) · council (the shipping skill) ·
-  self-questions (the same executor asks its own questions — the ablation
-  that isolates what the council actually adds) · single critic.
-- **Grading:** deterministic unit tests authored from hidden specs and frozen
-  before any model call — not model opinion.
-- **Reproducibility:** raw transcripts for all 56 runs ship in the repo
-  audit trail (`eval/results/`), and the whole pipeline runs offline for
-  zero dollars with `pwsh -File eval/Invoke-DryRunSmoke.ps1`.
+  self-questions (the executor asks its own questions — the ablation) ·
+  sham context (dossier from the wrong task) · compute-matched best-of-3.
+- **Grading:** deterministic unit tests authored from hidden specs, blind
+  to the skill's design, calibrated to a 30–70% baseline band, and frozen
+  (SHA-256) before any model call — not model opinion.
+- **Reproducibility:** raw transcripts for all 325 wave-2 runs ship in the
+  repo audit trail (`eval/results/`), and the whole pipeline runs offline
+  for zero dollars with `pwsh -File eval/Invoke-DryRunSmoke.ps1`.
 
 ## Why not just ask the model to think harder?
 

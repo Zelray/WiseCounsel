@@ -26,7 +26,7 @@
 | Pilot task suite + freezes (FROZEN-HASHES / -wave2 / -v3) | ✅ untouched measurement history; **v0.2.0 drift vs -v3 noted in HANDOFF-V02-BUILD.md, deliberately not re-frozen** |
 | Pilot eval run | ✅ (history — superseded by wave 2) |
 | Wave-2 confirmatory run | ✅ (history): scaffold +13.2 pp (p=0.0002) confirmed; council premium NULL (B−C −0.5 pp, p=0.90); full read docs/RESULTS.md |
-| Public-repo readiness + GitHub | ✅ published v0.1.0 (2026-10-05, CI green); v0.2.0 push → tag on CI green |
+| Public-repo readiness + GitHub | ✅ published v0.1.0 (2026-10-05, CI green); v0.2.0 tagged; **README re-led as a case study + DECISION-MEMO.md (founder voice, owner-approved) — commit 5de6c98, CI green** |
 | Engine `-OutDir` default writes inside the package (wise-counsel/runs/) | 🟡 still known; gitignored; **follow-up candidate now that the eval is done** (not in v0.2.0 scope) |
 
 ## Next steps

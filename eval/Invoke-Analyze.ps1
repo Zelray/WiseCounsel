@@ -138,7 +138,7 @@ foreach ($arm in $arms) {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('| Comparison | Mean delta (pp) | 95% CI (pp) | p (sign-flip) | n tasks |')
 [void]$sb.AppendLine('|---|---|---|---|---|')
-foreach ($cmp in @(@('B','A'), @('C','A'), @('B','C'), @('D','B'))) {
+foreach ($cmp in @(@('B','C'), @('B','A'), @('C','A'), @('B','E'), @('B','F'), @('E','A'), @('F','A'))) {
   $d = Get-Deltas $cmp[0] $cmp[1]
   if ($d.Count -eq 0) { continue }
   $md = ($d | Measure-Object -Average).Average

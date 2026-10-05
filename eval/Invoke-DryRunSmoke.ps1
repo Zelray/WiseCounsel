@@ -24,7 +24,7 @@ function Fail([string]$why) {
 }
 
 # 1. Full mock pipeline
-& (Join-Path $evalRoot 'Invoke-Eval.ps1') -Mock -Arms A,B,C,D -Reps 1 -ResultsDir $work *> (Join-Path $work 'eval-log.txt')
+& (Join-Path $evalRoot 'Invoke-Eval.ps1') -Mock -Arms A,B,C,E,F -Reps 1 -ResultsDir $work *> (Join-Path $work 'eval-log.txt')
 if ($LASTEXITCODE -ne 0) { Fail "Invoke-Eval -Mock exited $LASTEXITCODE (see eval-log.txt)" }
 
 # 2. Manifest sanity

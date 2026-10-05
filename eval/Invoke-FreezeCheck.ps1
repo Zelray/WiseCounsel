@@ -12,13 +12,18 @@
   overwrite in place).
 #>
 [CmdletBinding()]
-param([switch]$Update)
+param(
+  [switch]$Update,
+  # Wave 2 freezes into a separate manifest (FROZEN-HASHES-wave2.txt); the
+  # pilot's manifest is a historical record this script never overwrites.
+  [string]$ManifestPath = ''
+)
 
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $evalRoot = $PSScriptRoot
 $repoRoot = Split-Path -Parent $evalRoot
-$manifestPath = Join-Path $evalRoot 'FROZEN-HASHES.txt'
+if (-not $ManifestPath) { $ManifestPath = Join-Path $evalRoot 'FROZEN-HASHES.txt' }
 
 $targets = @()
 $targets += Get-ChildItem (Join-Path $repoRoot 'wise-counsil') -Recurse -File |

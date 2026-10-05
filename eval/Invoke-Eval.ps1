@@ -36,8 +36,8 @@ if ($Arms.Count -eq 1 -and "$($Arms[0])" -match ',') {
 if ($TaskFilter.Count -eq 1 -and "$($TaskFilter[0])" -match ',') {
   $TaskFilter = @("$($TaskFilter[0])" -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 }
-$badArms = @($Arms | Where-Object { @('A','B','C','D') -notcontains $_ })
-if ($badArms.Count -gt 0) { Write-Host "ERROR: unknown arm(s): $($badArms -join ', ') (valid: A, B, C, D)"; exit 3 }
+$badArms = @($Arms | Where-Object { @('A','B','C','D','E','F') -notcontains $_ })
+if ($badArms.Count -gt 0) { Write-Host "ERROR: unknown arm(s): $($badArms -join ', ') (valid: A, B, C, D, E, F)"; exit 3 }
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
@@ -87,6 +87,13 @@ $manifestPath = Join-Path $ResultsDir 'manifest.jsonl'
 $script:Spend = 0.0
 $script:CouncilScript = Join-Path $repoRoot $cfg.council.scriptPath
 $script:PremortemTemplate = Get-Content (Join-Path $evalRoot 'templates\premortem.txt') -Raw
+# Arm E: one sham dossier per donor task, generated once and reused across
+# repetitions (fixed-question-sets rule); a failed sham council is cached as
+# '' and its run proceeds without enrichment, same as arm B's failure rule.
+$script:ShamDossiers = @{}
+# Fixed task order for arm E's rotation (post-filter launch order).
+$cardIdxByTaskId = @{}
+for ($i = 0; $i -lt $cards.Count; $i++) { $cardIdxByTaskId[$cards[$i].task_id] = $i }
 
 # --- model call ------------------------------------------------------------------
 function Invoke-ModelCall {
@@ -180,7 +187,7 @@ none
     }
     return [pscustomobject]@{ ok = $true; content = ($pairs | ConvertTo-Json -Depth 4); tokens = 0; cost = 0.0; latencyMs = 0; servedModel = 'mock'; error = '' }
   }
-  if ($Purpose -eq 'executor') {
+  if ($Purpose -like 'executor*') {
     if ($TaskCard.track -eq 1) {
       $refPath = Join-Path $evalRoot "tasks\$($TaskCard.reference_solution)"
       $code = Get-Content -LiteralPath $refPath -Raw -Encoding UTF8
@@ -198,6 +205,9 @@ Pick option B. It meets the stated volume at the lowest all-in cost, with an exp
     $content = '{' + ($dims -join ',') + ',"total":' + (2 * @($TaskCard.rubric).Count) + ',"one_line":"mock"}'
     return [pscustomobject]@{ ok = $true; content = $content; tokens = 0; cost = 0.0; latencyMs = 0; servedModel = 'mock'; error = '' }
   }
+  if ($Purpose -eq 'selector') {
+    return [pscustomobject]@{ ok = $true; content = '1'; tokens = 0; cost = 0.0; latencyMs = 0; servedModel = 'mock'; error = '' }
+  }
   if ($Purpose -eq 'probe') {
     return [pscustomobject]@{ ok = $true; content = 'baseline'; tokens = 0; cost = 0.0; latencyMs = 0; servedModel = 'mock'; error = '' }
   }
@@ -214,13 +224,17 @@ function Get-QuestionsFromSynthesis([string]$text) {
 }
 
 function Invoke-CouncilStep {
-  param([object]$Card, [string]$RunDir)
+  # BriefOverride (arm E only): run the council on a DIFFERENT task's brief
+  # (sham context). The overridden brief is logged as brief-sham.txt so the
+  # audit trail always shows the exact text the council saw.
+  param([object]$Card, [string]$RunDir, [string]$BriefOverride = '', [string]$BriefFileName = 'brief.txt')
+  $briefText = if ($BriefOverride) { $BriefOverride } else { $Card.public_brief }
   if ($Mock) {
     $r = Invoke-MockCall -Purpose 'council' -TaskCard $Card
     return @{ dossier = $r.content; cost = 0.0; exit = 0 }
   }
-  $briefFile = Join-Path $RunDir 'brief.txt'
-  Set-Content -LiteralPath $briefFile -Value $Card.public_brief -Encoding UTF8
+  $briefFile = Join-Path $RunDir $BriefFileName
+  Set-Content -LiteralPath $briefFile -Value $briefText -Encoding UTF8
   $councilOut = Join-Path $RunDir 'council'
   & $script:CouncilScript -Mode premortem -TaskFile $briefFile -OutDir $councilOut *> "$RunDir\council-log.txt"
   $exit = $LASTEXITCODE
@@ -313,7 +327,9 @@ function Get-DeliveredAnswers {
 }
 
 function Invoke-BuildStep {
-  param([object]$Card, [string]$RunDir, [string[]]$AnswerLines)
+  # PurposeSuffix (arm F only): disambiguates the logged prompts/responses of
+  # the three independent candidate builds (-f1/-f2/-f3) inside one run dir.
+  param([object]$Card, [string]$RunDir, [string[]]$AnswerLines, [string]$PurposeSuffix = '')
   $user = "TASK BRIEF:`n$($Card.public_brief)"
   if ($AnswerLines.Count -gt 0) {
     $user += "`n`nANSWERS TO YOUR OPEN QUESTIONS:`n" + ($AnswerLines -join "`n")
@@ -325,13 +341,39 @@ function Invoke-BuildStep {
   }
   $r = Invoke-ModelCall -Model $cfg.executor.id -System 'You are a senior engineer producing a final deliverable.' -User $user `
     -Temperature $cfg.executor.temperature -MaxTokens $cfg.executor.maxTokens -TimeoutSec $cfg.executor.timeoutSec `
-    -Purpose 'executor' -RunDir $RunDir -TaskCard $Card
+    -Purpose "executor$PurposeSuffix" -RunDir $RunDir -TaskCard $Card
   return $r
+}
+
+function Invoke-SelectionStep {
+  # Arm F: pick the best of the three candidate builds. Executor-family model,
+  # temperature 0, single token answer. Pre-stated fallback (wave-2 addendum):
+  # non-1-3 selector output -> candidate 1 + flag; selector call failure ->
+  # candidate 1 + flag.
+  param([object]$Card, [object[]]$Candidates, [string]$RunDir)
+  $parts = for ($k = 0; $k -lt @($Candidates).Count; $k++) {
+    $c = $Candidates[$k]
+    $body = if ($c.ok) { $c.content } else { '(candidate failed to generate)' }
+    "=== CANDIDATE $($k + 1) ===`n$body"
+  }
+  $sys = 'You will be given a TASK BRIEF and three candidate solutions. Reply with ONLY the number 1-3 of the solution that best satisfies the brief. No other text.'
+  $user = "TASK BRIEF:`n$($Card.public_brief)`n`n" + ($parts -join "`n`n")
+  $r = Invoke-ModelCall -Model $cfg.executor.id -System $sys -User $user `
+    -Temperature 0.0 -MaxTokens 8 -TimeoutSec $cfg.executor.timeoutSec `
+    -Purpose 'selector' -RunDir $RunDir
+  if (-not $r.ok) { return @{ index = 1; raw = ''; cost = $r.cost; flag = 'selection-failed' } }
+  $m = [regex]::Match($r.content, '[123]')
+  if (-not $m.Success) { return @{ index = 1; raw = $r.content; cost = $r.cost; flag = 'selection-invalid' } }
+  return @{ index = [int]$m.Value; raw = $r.content.Trim(); cost = $r.cost; flag = '' }
 }
 
 function Get-Track1Solution([string]$content, [string]$RunDir) {
   $m = [regex]::Match($content, '(?s)```python\s*(.*?)```')
-  $code = if ($m.Success) { $m.Groups[1].Value } else { $content }
+  # Whole-content fallback: strip bare/unclosed fence lines so a response that
+  # opens a fence but never closes it cannot poison the graded file (this
+  # zeroed 2 pilot baseline runs; see wave-2 addendum).
+  $code = if ($m.Success) { $m.Groups[1].Value }
+          else { ($content -replace '(?m)^\s*```(python)?\s*$', '').Trim() }
   $p = Join-Path $RunDir 'solution.py'
   Set-Content -LiteralPath $p -Value $code -Encoding UTF8
   return $p
@@ -421,6 +463,7 @@ foreach ($slot in $schedule) {
   $flags = [System.Collections.Generic.List[string]]::new()
   $runCost = 0.0
   $questions = @()
+  $shamDonorTask = $null
 
   # Arm-specific pre-build material
   $answerLines = @()
@@ -462,12 +505,51 @@ foreach ($slot in $schedule) {
         $answerLines | Set-Content (Join-Path $runDir 'answers-delivered.txt') -Encoding UTF8
       }
     }
+  } elseif ($arm -eq 'E') {
+    # Sham context: the dossier comes from the NEXT task in the fixed order
+    # (i+1 mod n) — one real council call per donor task, rotated by one, so
+    # the synthesis gets realistic extra text about the WRONG task.
+    $donor = $cards[($cardIdxByTaskId[$card.task_id] + 1) % $cards.Count]
+    $shamDonorTask = $donor.task_id
+    if (-not $script:ShamDossiers.ContainsKey($donor.task_id)) {
+      $c = Invoke-CouncilStep -Card $card -RunDir $runDir -BriefOverride $donor.public_brief -BriefFileName 'brief-sham.txt'
+      $runCost += $c.cost
+      if ($c.exit -ne 0) { $script:ShamDossiers[$donor.task_id] = ''; $flags.Add('council-failed') }
+      else { $script:ShamDossiers[$donor.task_id] = $c.dossier }
+    }
+    $dossier = $script:ShamDossiers[$donor.task_id]
+    if ($dossier) {
+      $syn = Invoke-SynthesisStep -Card $card -RunDir $runDir -Dossier $dossier
+      $runCost += $syn.cost
+      if (-not $syn.ok) { $flags.Add('synthesis-failed') } else {
+        $questions = $syn.questions
+        $match = Invoke-MatcherStep -Card $card -Questions $questions -RunDir $runDir
+        $runCost += $match.cost
+        $answerLines = Get-DeliveredAnswers -Card $card -Questions $questions -Mapping $match.mapping
+        $answerLines | Set-Content (Join-Path $runDir 'answers-delivered.txt') -Encoding UTF8
+      }
+    }
   }
   ConvertTo-Json -InputObject @($questions) | Set-Content (Join-Path $runDir 'questions.json') -Encoding UTF8
 
-  # Build
-  $build = Invoke-BuildStep -Card $card -RunDir $runDir -AnswerLines $answerLines
-  $runCost += $build.cost
+  # Build (arm F: three plain-brief candidates + a selector call; others: one)
+  if ($arm -eq 'F') {
+    $candidates = @()
+    for ($k = 1; $k -le 3; $k++) {
+      $b = Invoke-BuildStep -Card $card -RunDir $runDir -AnswerLines @() -PurposeSuffix "-f$k"
+      $runCost += $b.cost
+      $candidates += $b
+    }
+    $sel = Invoke-SelectionStep -Card $card -Candidates $candidates -RunDir $runDir
+    $runCost += $sel.cost
+    if ($sel.flag) { $flags.Add($sel.flag) }
+    @{ selector_reply = $sel.raw; chosen = $sel.index; selector_flag = $sel.flag } |
+      ConvertTo-Json -Depth 4 | Set-Content (Join-Path $runDir 'best-of-3.json') -Encoding UTF8
+    $build = @($candidates)[[math]::Max(1, $sel.index) - 1]
+  } else {
+    $build = Invoke-BuildStep -Card $card -RunDir $runDir -AnswerLines $answerLines
+    $runCost += $build.cost
+  }
   $score = 0.0; $passed = 0; $total = 0
   if (-not $build.ok) {
     $flags.Add('executor-failed')
@@ -503,6 +585,7 @@ foreach ($slot in $schedule) {
     score = $score; passed = $passed; total = $total
     questions_asked = $questions.Count
     council_exit = $null
+    sham_donor_task = $shamDonorTask
     cost_usd = [math]::Round($runCost, 6); latency_ms = $build.latencyMs
     mock = [bool]$Mock
     flags = @($flags); leak = $leakVerdict

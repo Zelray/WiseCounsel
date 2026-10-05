@@ -81,7 +81,7 @@ function Invoke-ExecutorCall {
   try {
     $resp = Invoke-RestMethod -Uri $cfg.endpoint -Method Post -Headers @{
       Authorization = "Bearer $key"
-      'X-Title'     = 'WiseCounsil-Calibration'
+      'X-Title'     = 'WiseCounsel-Calibration'
     } -ContentType 'application/json; charset=utf-8' -Body $body -TimeoutSec $cfg.executor.timeoutSec
     $resp | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $RunDir 'response.json') -Encoding UTF8
     $bodyObj | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $RunDir 'request.json') -Encoding UTF8

@@ -1,10 +1,10 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-  Freeze-manifest integrity check for the WiseCounsil eval.
+  Freeze-manifest integrity check for the WiseCounsel eval.
 .DESCRIPTION
   Creates (with -Update) or verifies (default) SHA-256 hashes for every file
-  of the measured artifact (wise-counsil/) and the frozen task suite
+  of the measured artifact (wise-counsel/) and the frozen task suite
   (eval/tasks/, eval/config.json, eval/templates/). The manifest is the
   pre-registration freeze record required by docs/EVAL-DESIGN.md; it is
   created BEFORE any evaluation data collection and never edited afterwards
@@ -26,7 +26,7 @@ $repoRoot = Split-Path -Parent $evalRoot
 if (-not $ManifestPath) { $ManifestPath = Join-Path $evalRoot 'FROZEN-HASHES.txt' }
 
 $targets = @()
-$targets += Get-ChildItem (Join-Path $repoRoot 'wise-counsil') -Recurse -File |
+$targets += Get-ChildItem (Join-Path $repoRoot 'wise-counsel') -Recurse -File |
   Where-Object { $_.FullName -notmatch '\\runs\\' }
 $targets += Get-ChildItem (Join-Path $evalRoot 'tasks') -File
 $targets += Get-ChildItem (Join-Path $evalRoot 'templates') -File
@@ -41,7 +41,7 @@ $lines = foreach ($f in $sortedTargets) {
 
 if ($Update) {
   if (Test-Path $manifestPath) { Write-Host 'FREEZE-REFUSED: manifest already exists (re-freeze is a dated addendum, not an overwrite)'; exit 3 }
-  $header = "# WiseCounsil eval freeze manifest — $((Get-Date).ToUniversalTime().ToString('o')) — SHA-256"
+  $header = "# WiseCounsel eval freeze manifest — $((Get-Date).ToUniversalTime().ToString('o')) — SHA-256"
   $all = @($header) + @($lines)
   Set-Content -LiteralPath $manifestPath -Value $all -Encoding UTF8
   Write-Host "FREEZE-CREATED ($(@($lines).Count) files)"

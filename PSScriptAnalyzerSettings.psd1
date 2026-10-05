@@ -1,14 +1,14 @@
-# PSScriptAnalyzer settings for WiseCounsil CI.
+# PSScriptAnalyzer settings for WiseCounsel CI.
 #
 # This file is the documented record of which lint rules this codebase
 # knowingly deviates from, and why. Everything not excluded here is enforced
 # at Error + Warning severity in CI (.github/workflows/ci.yml).
 #
-# Exclusions (apply to the FROZEN skill package in wise-counsil/ and the eval
+# Exclusions (apply to the FROZEN skill package in wise-counsel/ and the eval
 # harness alike — the package must stay byte-identical during the eval, so
 # style deviations there are documented here rather than fixed in place):
 #
-# - PSUseApprovedVerbs: Invoke-WiseCounsil.ps1 defines Normalize-Result;
+# - PSUseApprovedVerbs: Invoke-WiseCounsel.ps1 defines Normalize-Result;
 #   "Normalize" is not an approved verb. Renaming it would break the frozen
 #   measured artifact for zero functional gain.
 # - PSAvoidUsingWriteHost: both shipping scripts are interactive CLI tools;
@@ -18,7 +18,7 @@
 #   exit codes, not interactive cmdlets; -WhatIf/-Confirm support adds
 #   surface area without value here.
 # - PSUseBOMForUnicodeEncodedFile: several scripts (including the FROZEN
-#   wise-counsil package, which must stay byte-identical and therefore can
+#   wise-counsel package, which must stay byte-identical and therefore can
 #   never gain a BOM) use deliberate em-dashes in comments under UTF-8; the
 #   rule would force either a BOM rewrite of the frozen artifact or an
 #   ASCII-ification churn across the measured pipeline. Documented here

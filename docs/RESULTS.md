@@ -140,8 +140,8 @@ The shipping skill's premortem council, as measured, adds nothing over
 asking the executor to enumerate its own questions — but the *scaffold
 around* the council (surface the open questions, answer them from an
 answer sheet, build once with the answers) is worth ~+13 points and beats
-spending 4× the compute on best-of-3 selection. Honest framing: WiseCounsil
-the scaffold works; WiseCounsil the multi-model council is, on this task
+spending 4× the compute on best-of-3 selection. Honest framing: WiseCounsel
+the scaffold works; WiseCounsel the multi-model council is, on this task
 class, undifferentiated from a mirror. Owner decisions that follow —
 (e.g. ship the scaffold with self-questions as the default and the council
 as an opt-in; or target task classes where diversity might matter, like

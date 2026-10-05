@@ -1,9 +1,9 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-  WiseCounsil: fire 2-6 cheap/free models in parallel to pre-think a task.
+  WiseCounsel: fire 2-6 cheap/free models in parallel to pre-think a task.
 .DESCRIPTION
-  Door A (OpenRouter) engine for the wise-counsil skill. Sends the user's
+  Door A (OpenRouter) engine for the wise-counsel skill. Sends the user's
   verbatim prompt to each roster member with a strict attack-don't-answer
   template, collects responses, and prints a per-model dossier.
   Debate mode adds round 2 (peer rebuttals, anonymized, sequential).
@@ -38,7 +38,7 @@ if (-not $Task -and $TaskFile) {
 if (-not $Task) { Write-Host "ERROR: no task given (use -Task or -TaskFile)"; exit 3 }
 
 # --- resolve config ----------------------------------------------------------
-if (-not $ConfigPath) { $ConfigPath = Join-Path $skillRoot 'config\wisecounsil.json' }
+if (-not $ConfigPath) { $ConfigPath = Join-Path $skillRoot 'config\WiseCounsel.json' }
 if (-not (Test-Path -LiteralPath $ConfigPath)) { Write-Host "ERROR: config not found: $ConfigPath"; exit 3 }
 $cfg = Get-Content -LiteralPath $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
 
@@ -169,7 +169,7 @@ function Normalize-Result($rows) {
 }
 
 # --- round 1: parallel dispatch ---------------------------------------------
-Write-Host "WiseCounsil: convening $($Models.Count) members ($Mode), round 1 (parallel)..."
+Write-Host "WiseCounsel: convening $($Models.Count) members ($Mode), round 1 (parallel)..."
 $sys1 = $sys
 $r1 = $Models | ForEach-Object -Parallel {
   $model = $_   # capture BEFORE try/catch: inside catch, $_ is the ErrorRecord
@@ -189,7 +189,7 @@ $r1 = $Models | ForEach-Object -Parallel {
     $body = $bodyObj | ConvertTo-Json -Depth 6
     $resp = Invoke-RestMethod -Uri 'https://openrouter.ai/api/v1/chat/completions' -Method Post -Headers @{
       Authorization = "Bearer $($using:key)"
-      'X-Title'     = 'WiseCounsil'
+      'X-Title'     = 'WiseCounsel'
     } -ContentType 'application/json; charset=utf-8' -Body $body -TimeoutSec $using:timeout
     [pscustomobject]@{
       ok = $true; model = $model; round = 1
@@ -213,7 +213,7 @@ Normalize-Result $r1
 # --- round 2 (debate only): sequential, anonymized peers ---------------------
 $ok1 = @($r1 | Where-Object { $_.ok })
 if ($Mode -eq 'debate' -and $ok1.Count -ge 2 -and $Rounds -ge 2) {
-  Write-Host "WiseCounsil: round 2 (peer rebuttals, sequential)..."
+  Write-Host "WiseCounsel: round 2 (peer rebuttals, sequential)..."
   $letters = 'ABCDEFGH'
   $peers = New-Object System.Text.StringBuilder
   for ($i = 0; $i -lt $ok1.Count; $i++) {
@@ -239,7 +239,7 @@ if ($Mode -eq 'debate' -and $ok1.Count -ge 2 -and $Rounds -ge 2) {
       $body = $bodyObj | ConvertTo-Json -Depth 6
       $resp = Invoke-RestMethod -Uri 'https://openrouter.ai/api/v1/chat/completions' -Method Post -Headers @{
         Authorization = "Bearer $key"
-        'X-Title' = 'WiseCounsil'
+        'X-Title' = 'WiseCounsel'
       } -ContentType 'application/json; charset=utf-8' -Body $body -TimeoutSec $timeout
       [pscustomobject]@{ ok = $true; model = $m.model; round = 2; content = $resp.choices[0].message.content; tokens = $resp.usage.total_tokens; cost = $resp.usage.cost; latencyMs = $sw.ElapsedMilliseconds; error = '' }
     } catch {
@@ -256,7 +256,7 @@ if ($Mode -eq 'debate' -and $ok1.Count -ge 2 -and $Rounds -ge 2) {
 
 # --- dossier ------------------------------------------------------------------
 $sb = New-Object System.Text.StringBuilder
-[void]$sb.AppendLine("# WiseCounsil dossier")
+[void]$sb.AppendLine("# WiseCounsel dossier")
 [void]$sb.AppendLine("mode=$Mode rounds=$Rounds date=$stamp outDir=$OutDir")
 [void]$sb.AppendLine("")
 [void]$sb.AppendLine("TASK (verbatim):")

@@ -20,6 +20,6 @@
   "keySource": "auto",
   "opencodego": {
     "enabled": false,
-    "agentsNamespace": "wisecounsil"
+    "agentsNamespace": "WiseCounsel"
   }
 }

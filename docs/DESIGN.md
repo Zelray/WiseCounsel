@@ -1,4 +1,4 @@
-# DESIGN.md — why WiseCounsil is shaped the way it is
+# DESIGN.md — why WiseCounsel is shaped the way it is
 
 ## The thesis
 

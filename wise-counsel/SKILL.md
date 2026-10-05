@@ -1,11 +1,11 @@
 ---
-name: wise-counsil
+name: wise-counsel
 description: >-
   Convene a cheap-model council BEFORE tackling a big task: 2-6 cheap or free
   models (OpenRouter or OpenCodeGo) independently pre-mortem a coding brief,
   debate a research question, or critique a plan; their findings merge into an
   enriched brief with open questions and a verify-later checklist before the
-  frontier model starts work. Triggers: "wise counsil", "council this",
+  frontier model starts work. Triggers: "wise counsel", "council this",
   "pre-think", "second opinion", "convene the council" — or beginning a new
   app/project build, a domain-rule-heavy feature (state math, tax/legal/
   compliance rules, calculators), a buy/sell or pick-X research decision, or a
@@ -13,7 +13,7 @@ description: >-
   well-specified edits, high-volume routine work, or casual chat.
 ---
 
-# WiseCounsil — cheap-model pre-think council
+# WiseCounsel — cheap-model pre-think council
 
 ## Prime directives (never violate)
 
@@ -41,13 +41,13 @@ description: >-
 | Domain-rule-heavy feature (state math, tax/legal/compliance, calculators) | Small, well-specified edit |
 | Buy/sell, pick-X, compare-options research decision | High-volume routine work |
 | Major architecture decision | Casual chat or simple question |
-| User explicitly says "wise counsil" / "council this" | User is in a hurry and the task is clear |
+| User explicitly says "wise counsel" / "council this" | User is in a hurry and the task is clear |
 
 ## Step 1 — Resolve the roster
 
 Resolution order (first hit wins):
-1. `wisecounsil.json` in the current project's `config/` folder (per-project override)
-2. This skill's own `config/wisecounsil.json`
+1. `WiseCounsel.json` in the current project's `config/` folder (per-project override)
+2. This skill's own `config/WiseCounsel.json`
 
 Validate: at least `minModels` (2), at most `maxModels` (6). If the config is
 missing or invalid, tell the user and proceed WITHOUT the council — never
@@ -74,7 +74,7 @@ Run the bundled script (resolve paths relative to this skill's folder; the
 project fallback path is recorded in the repo's `Agents.md`):
 
 ```
-pwsh -NoProfile -File "<skill_dir>\scripts\Invoke-WiseCounsil.ps1" `
+pwsh -NoProfile -File "<skill_dir>\scripts\Invoke-WiseCounsel.ps1" `
   -Mode premortem `
   -TaskFile "<temp file containing the user's verbatim prompt>" `
   -ConfigPath "<config path>"
@@ -94,8 +94,8 @@ pwsh -NoProfile -File "<skill_dir>\scripts\Invoke-WiseCounsil.ps1" `
 
 When `config.provider` is `"opencodego"` (or Door A is unavailable):
 dispatch one subagent per roster model via the Task tool, using the generated
-agent names in `config.opencodego.agentsNamespace` (e.g. `wisecounsil-qwen`,
-`wisecounsil-gpt-oss`), feeding each the SAME verbatim template from Step 5.
+agent names in `config.opencodego.agentsNamespace` (e.g. `WiseCounsel-qwen`,
+`WiseCounsel-gpt-oss`), feeding each the SAME verbatim template from Step 5.
 Collect their replies, then merge them yourself exactly as in Step 4. If the
 subagent door misbehaves, fall back to Door A.
 
@@ -237,7 +237,7 @@ Low / Medium / High + one sentence.
 
 ## Config reference
 
-`config/wisecounsil.json`:
+`config/WiseCounsel.json`:
 - `provider`: `"openrouter"` (Door A) or `"opencodego"` (Door B)
 - `models`: array of `{ id, label, family }`, 2–6 entries — THE roster
 - `limits`: `{ maxOutputTokens, timeoutSec, temperaturePremortem,
@@ -246,5 +246,5 @@ Low / Medium / High + one sentence.
 
 Presets live in `config/presets.json`: `balanced-six` (default),
 `free-six`, `pair-minimum`. To change the roster: edit the project copy,
-then re-run `scripts/Install-WiseCounsil.ps1` to sync the installed copy
+then re-run `scripts/Install-WiseCounsel.ps1` to sync the installed copy
 (or edit the installed copy directly for a quick experiment).

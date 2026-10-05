@@ -1,14 +1,14 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-  Install the WiseCounsil skill into OpenCode and/or Claude Code skill dirs.
+  Install the WiseCounsel skill into OpenCode and/or Claude Code skill dirs.
 .DESCRIPTION
   Validates the roster config, optionally checks every model id against the
   live OpenRouter catalog, checks for an API key, then copies the whole
-  wise-counsil package to the skill directories. Never prints the key.
+  wise-counsel package to the skill directories. Never prints the key.
 .EXAMPLE
-  pwsh -File scripts\Install-WiseCounsil.ps1                  # both harnesses
-  pwsh -File scripts\Install-WiseCounsil.ps1 -OpenCode -SkipValidation
+  pwsh -File scripts\Install-WiseCounsel.ps1                  # both harnesses
+  pwsh -File scripts\Install-WiseCounsel.ps1 -OpenCode -SkipValidation
 #>
 [CmdletBinding()]
 param(
@@ -22,13 +22,13 @@ $ProgressPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
 $repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$pkg = Join-Path $repo 'wise-counsil'
+$pkg = Join-Path $repo 'wise-counsel'
 if (-not (Test-Path -LiteralPath (Join-Path $pkg 'SKILL.md'))) { Write-Host "ERROR: skill package not found at $pkg"; exit 1 }
 
 if (-not $OpenCode -and -not $Claude) { $OpenCode = $true; $Claude = (Test-Path -LiteralPath "$HOME\.claude") }
 
 # --- config sanity -------------------------------------------------------------
-$cfgPath = Join-Path $pkg 'config\wisecounsil.json'
+$cfgPath = Join-Path $pkg 'config\WiseCounsel.json'
 $cfg = Get-Content -LiteralPath $cfgPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $count = @($cfg.models).Count
 if ($count -lt $cfg.minModels -or $count -gt $cfg.maxModels) {
@@ -58,8 +58,8 @@ Write-Host "OpenRouter key present: $hasKey $(if (-not $hasKey) { '(skill will f
 
 # --- install --------------------------------------------------------------------
 $targets = @()
-if ($OpenCode) { $targets += Join-Path $HOME '.config\opencode\skills\wise-counsil' }
-if ($Claude) { $targets += Join-Path $HOME '.claude\skills\wise-counsil' }
+if ($OpenCode) { $targets += Join-Path $HOME '.config\opencode\skills\wise-counsel' }
+if ($Claude) { $targets += Join-Path $HOME '.claude\skills\wise-counsel' }
 foreach ($t in $targets) {
   New-Item -ItemType Directory -Force -Path $t | Out-Null
   Copy-Item -LiteralPath (Join-Path $pkg 'SKILL.md') -Destination $t -Force
@@ -71,5 +71,5 @@ foreach ($t in $targets) {
 }
 
 Write-Host ""
-Write-Host "Done. Use it by saying: 'wise counsil' / 'council this' before a big task."
+Write-Host "Done. Use it by saying: 'wise counsel' / 'council this' before a big task."
 Write-Host "Rosters can be switched with the -Preset flag (balanced-six, free-six, pair-minimum)."

@@ -1,4 +1,4 @@
-# WiseCounsil
+# WiseCounsel
 
 **A council of cheap AI models that reads your prompt before your frontier
 model does — and makes the frontier model's first try the right one.**
@@ -9,7 +9,7 @@ frontier model writes a line of code. You answer a handful of build-changing
 questions; the frontier model gets an enriched brief instead of guessing in
 silence. A full council costs **~$0.003** and takes ~15–45 seconds.
 
-[![ci](https://github.com/Zelray/WiseCounsil/actions/workflows/ci.yml/badge.svg)](https://github.com/Zelray/WiseCounsil/actions/workflows/ci.yml)
+[![ci](https://github.com/Zelray/WiseCounsel/actions/workflows/ci.yml/badge.svg)](https://github.com/Zelray/WiseCounsel/actions/workflows/ci.yml)
 
 It also runs **debates** (six models take positions, then rebut each other
 anonymously) and **plan critiques** (cheap models attack your plan before you
@@ -17,7 +17,7 @@ execute it).
 
 ## Evidence
 
-WiseCounsil's improvement claim is tested, not asserted. The full
+WiseCounsel's improvement claim is tested, not asserted. The full
 pre-registered protocol — hypotheses, arms, grading, statistics, and a hard
 budget — was committed to this repo **before** any evaluation data was
 collected ([docs/EVAL-DESIGN.md](docs/EVAL-DESIGN.md)), and both the pilot
@@ -30,7 +30,7 @@ with answered open questions lifted the executor's first-attempt pass rate
 **+13.2 points** (44.8% → 58.0%, p = 0.0002) and beat compute-matched
 best-of-3-with-selection, which gained **exactly zero** over a single
 attempt. But the multi-model council itself — the part that makes
-WiseCounsil WiseCounsil — **did not earn its keep**: the confirmatory
+WiseCounsel WiseCounsel — **did not earn its keep**: the confirmatory
 primary comparison (council vs the executor asking its own questions) came
 in at **B − C = −0.5 points (95% CI [−5.7, +4.5], p = 0.90)**, and a sham
 dossier built from a *different* task performed identically to the real
@@ -62,19 +62,19 @@ harness in `eval/` is built to answer it honestly.
 ## Install
 
 ```powershell
-git clone https://github.com/Zelray/WiseCounsil.git WiseCounsil
-cd WiseCounsil\wise-counsil
-pwsh -File scripts\Install-WiseCounsil.ps1
+git clone https://github.com/Zelray/WiseCounsel.git WiseCounsel
+cd WiseCounsel\wise-counsel
+pwsh -File scripts\Install-WiseCounsel.ps1
 ```
 
 The installer validates every roster model against OpenRouter's live catalog,
 checks your API key (`env:OPENROUTER_API_KEY` or `~\.openrouter-client.key`),
-and copies the skill into `~\.config\opencode\skills\wise-counsil\` and
-`~\.claude\skills\wise-counsil\`.
+and copies the skill into `~\.config\opencode\skills\wise-counsel\` and
+`~\.claude\skills\wise-counsel\`.
 
 ## Use
 
-Say **"wise counsil"** (or "council this") before a big task. Modes are
+Say **"wise counsel"** (or "council this") before a big task. Modes are
 picked automatically and can be forced: `premortem` (default for builds),
 `debate` (research/decision questions, 2 rounds), `critique` (attack an
 existing plan).
@@ -105,7 +105,7 @@ mitigations, the synthesis split, the engineering decision log — lives in
 
 ## Honest limits
 
-Cheap models hallucinate confidently; WiseCounsil's mitigations (attack-don't-
+Cheap models hallucinate confidently; WiseCounsel's mitigations (attack-don't-
 answer templates, candidates-not-facts framing, verify-later checklists)
 reduce but do not eliminate contamination. Six models trained on overlapping
 internet data herd toward consensus narratives — especially on finance. This

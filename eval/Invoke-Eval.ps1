@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-  WiseCounsil A/B evaluation harness (pilot, per docs/EVAL-DESIGN.md).
+  WiseCounsel A/B evaluation harness (pilot, per docs/EVAL-DESIGN.md).
 .DESCRIPTION
   Runs task cards through arms A (baseline), B (council), C (self-questions),
   D (single critic) under identical conditions, grades Track-1 deliverables
@@ -120,7 +120,7 @@ function Invoke-ModelCall {
   try {
     $resp = Invoke-RestMethod -Uri $cfg.endpoint -Method Post -Headers @{
       Authorization = "Bearer $key"
-      'X-Title'     = 'WiseCounsil-Eval'
+      'X-Title'     = 'WiseCounsel-Eval'
     } -ContentType 'application/json; charset=utf-8' -Body $body -TimeoutSec $TimeoutSec
     if ($RunDir) {
       @{ purpose = $Purpose; model = $Model; body = $bodyObj } |
@@ -145,7 +145,7 @@ function Invoke-MockCall {
   param([string]$Purpose, [object]$TaskCard)
   if ($Purpose -eq 'council') {
     $content = @'
-# WiseCounsil dossier (MOCK)
+# WiseCounsel dossier (MOCK)
 ## [mock-a] (mock/a-1)
 ## Missing
 The brief does not state rounding, validation, or boundary rules.
@@ -450,7 +450,7 @@ $schedule = @()
 for ($rep = 1; $rep -le $Reps; $rep++) {
   foreach ($card in $cards) { foreach ($arm in $Arms) { $schedule += @{ card = $card; arm = $arm; rep = $rep } } }
 }
-Write-Host "WiseCounsil eval: $($cards.Count) tasks x $($Arms.Count) arms x $Reps reps = $($schedule.Count) runs (mode: $(if ($Mock) { 'MOCK' } else { 'LIVE' }), cap: `$$MaxSpendUsd)"
+Write-Host "WiseCounsel eval: $($cards.Count) tasks x $($Arms.Count) arms x $Reps reps = $($schedule.Count) runs (mode: $(if ($Mock) { 'MOCK' } else { 'LIVE' }), cap: `$$MaxSpendUsd)"
 
 $done = 0
 try {

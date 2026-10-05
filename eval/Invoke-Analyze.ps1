@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-  Analyze a WiseCounsil eval manifest into summary tables + statistics.
+  Analyze a WiseCounsel eval manifest into summary tables + statistics.
 .DESCRIPTION
   Implements the pre-registered analysis in docs/EVAL-DESIGN.md: paired
   task-level deltas, exact sign-flip permutation test (2^n, exhaustive up to

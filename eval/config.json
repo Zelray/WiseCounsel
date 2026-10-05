@@ -18,7 +18,7 @@
   ],
   "armProbe": true,
   "council": {
-    "scriptPath": "wise-counsil/scripts/Invoke-WiseCounsil.ps1",
+    "scriptPath": "wise-counsel/scripts/Invoke-WiseCounsel.ps1",
     "preset": "balanced-six",
     "timeoutSec": 240
   },

@@ -1,7 +1,7 @@
 # runs/ contain raw council dossiers including the user's verbatim prompts.
 # Do not commit without review.
 # KEEP THIS RULE UNANCHORED (no leading slash): the engine writes dossiers to
-# wise-counsil/runs/ inside the package, and the unanchored pattern is what
+# wise-counsel/runs/ inside the package, and the unanchored pattern is what
 # keeps those gitignored. Anchoring it to /runs/ would expose raw user prompts
 # to a casual `git add .`.
 runs/

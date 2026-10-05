@@ -32,7 +32,7 @@ jobs:
       - name: Validate JSON (configs + task cards)
         shell: pwsh
         run: |
-          $files = @(Get-ChildItem wise-counsil/config/*.json) + @(Get-ChildItem eval/*.json) + @(Get-ChildItem eval/tasks/*.json -ErrorAction SilentlyContinue)
+          $files = @(Get-ChildItem wise-counsel/config/*.json) + @(Get-ChildItem eval/*.json) + @(Get-ChildItem eval/tasks/*.json -ErrorAction SilentlyContinue)
           if ($files.Count -eq 0) { "no JSON found"; exit 1 }
           foreach ($f in $files) { Get-Content $f.FullName -Raw | ConvertFrom-Json | Out-Null }
           "JSON-OK ($($files.Count) files)"
@@ -49,7 +49,7 @@ jobs:
 
       - name: Installer smoke (offline, runner-home only)
         shell: pwsh
-        run: pwsh -NoProfile -File wise-counsil/scripts/Install-WiseCounsil.ps1 -OpenCode -Claude -SkipValidation
+        run: pwsh -NoProfile -File wise-counsel/scripts/Install-WiseCounsel.ps1 -OpenCode -Claude -SkipValidation
 
       - name: Eval dry-run (offline end-to-end, zero spend)
         shell: pwsh

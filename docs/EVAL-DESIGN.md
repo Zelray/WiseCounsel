@@ -1,4 +1,4 @@
-# WiseCounsil Evaluation — Pre-registered Design (v1)
+# WiseCounsel Evaluation — Pre-registered Design (v1)
 
 > **Preregistration.** This document was committed to the repository BEFORE any
 > evaluation data was collected. It specifies the hypotheses, arms, tasks,
@@ -21,7 +21,7 @@ tests, relative to the same executor receiving the brief alone.
 
 **Hypothesis (H2, mechanism claim — the scientifically interesting one):** the
 council's question selection beats the executor's *own* question generation
-under identical downstream conditions. H2 is the claim that makes WiseCounsil
+under identical downstream conditions. H2 is the claim that makes WiseCounsel
 more than "asking clarifying questions helps" — it is confirmed, if at all,
 only in wave 2 (see Statistics).
 
@@ -40,7 +40,7 @@ provider-load drift cannot correlate with arm), and a single-shot executor
 | Arm | Name | Pipeline |
 |---|---|---|
 | **Arm A** | baseline | Public brief → executor builds the deliverable in one pass. No mention that questions or answers exist. Structurally cannot touch answer-sheet text (separate code path; leakage-checked). |
-| **Arm B** | council | Public brief → the **shipping skill** (`wise-counsil/scripts/Invoke-WiseCounsil.ps1 -Mode premortem`) convenes the 6-member council → the executor model itself synthesizes the skill's Step-4 final brief (≤5 open questions, exactly as the product works) → a clerical matcher pairs questions to frozen answer-sheet entries → executor builds with the brief + verbatim matched answers. Unmatched questions get the fixed fallback: "Not specified — use best judgment and state the assumption in a comment." |
+| **Arm B** | council | Public brief → the **shipping skill** (`wise-counsel/scripts/Invoke-WiseCounsel.ps1 -Mode premortem`) convenes the 6-member council → the executor model itself synthesizes the skill's Step-4 final brief (≤5 open questions, exactly as the product works) → a clerical matcher pairs questions to frozen answer-sheet entries → executor builds with the brief + verbatim matched answers. Unmatched questions get the fixed fallback: "Not specified — use best judgment and state the assumption in a comment." |
 | **Arm C** | self-questions | Identical to Arm B **minus the dossier**: the executor generates its own ≤5 questions from the brief alone (same synthesis prompt, empty dossier slot), matched and answered by the same matcher with the same fallback. **B vs C holds everything constant except where the questions came from — this is the ablation that isolates the council.** |
 | **Arm D** | single critic (exploratory, pilot only) | Identical to B with a one-member council (single cheap model, same template). Answers "panel vs single critic"; demoted to exploratory so it cannot dilute the hierarchy. |
 
@@ -268,10 +268,28 @@ numbers are kept as history only.
   pilot manifest `eval/FROZEN-HASHES.txt` is untouched and remains the
   pilot's historical record; after wave-2 task files land, the pilot
   manifest necessarily no longer matches the tree (the wave-2 manifest is
-  the live oracle). `wise-counsil/` is unchanged and byte-identical in both
+  the live oracle). `wise-counsel/` is unchanged and byte-identical in both
   manifests.
 - **Budget.** Expected spend $2.50–4.00 (pilot Track-1 cost $0.24 at 48 runs
   scaled ×6.25, plus arm F's extra calls, plus Track-2 judging ≈ $0.4).
   **Hard cap $8.00** enforced at launch via `-MaxSpendUsd 8` (harness aborts,
   exit 4, preserving completed runs). Calibration spend (~24 × $0.002) is
   suite-construction cost, disclosed here, spent before the freeze.
+
+### Rename addendum (2026-10-05, post-publication)
+
+The project was renamed **WiseCounsil → WiseCounsel** (owner correction of
+a misspelling) AFTER all published data was collected. Consequences, stated
+plainly:
+
+- Wave-2 (and pilot) results were measured on the pre-rename artifact. The
+  measurement records are preserved byte-identical as history: task packs
+  (`eval/tasks/**`), both freeze manifests (`eval/FROZEN-HASHES.txt`,
+  `eval/FROZEN-HASHES-wave2.txt`), and all raw transcripts
+  (`eval/results/raw/**`) keep the old name/paths and are never edited.
+  Every number in docs/RESULTS.md remains exactly as measured.
+- The live package, scripts, installer, docs, CI, and this repository are
+  renamed. The freeze oracle for the renamed artifact is
+  `eval/FROZEN-HASHES-v3.txt`, created immediately after the rename; no
+  evaluation data has been collected under it. Any future evaluation re-opens
+  this document as a dated addendum first.

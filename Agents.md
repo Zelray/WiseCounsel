@@ -1,4 +1,4 @@
-# Agents.md — WiseCounsil conventions
+# Agents.md — WiseCounsel conventions
 
 Any agent (Claude, OpenCode, or other) working in this repository: read this
 file first. It is the canonical conventions doc. `CLAUDE.md` is a pointer to
@@ -6,7 +6,7 @@ this file for Claude Code sessions.
 
 ## What this project is
 
-**WiseCounsil** is a harness-native skill: before a frontier model starts a
+**WiseCounsel** is a harness-native skill: before a frontier model starts a
 big task, it convenes a council of 2–6 cheap/free models (OpenRouter or
 OpenCodeGo) that *attack the user's prompt* — surfacing gaps, ambiguities,
 risky assumptions, and approach sketches. Their findings are merged into an
@@ -16,30 +16,30 @@ model then executes against.
 Core design principle: **cheap models attack, frontier model decides.**
 Council members never produce final answers; their claims are always
 candidates to verify. See `docs/DESIGN.md` for the full rationale and
-`wise-counsil/SKILL.md` for the operating protocol.
+`wise-counsel/SKILL.md` for the operating protocol.
 
 ## Structure map
 
 ```
-WiseCounsil/
+WiseCounsel/
 ├── Agents.md            ← this file (canonical conventions)
 ├── CLAUDE.md            ← thin pointer for Claude Code sessions
 ├── README.md            ← plain-English pitch + quickstart (PM-readable)
 ├── STATUS.md            ← one-glance status chart (consumed by Joey)
 ├── docs/DESIGN.md       ← design rationale, failure modes, roadmap
 ├── runs/                ← (gitignored) dossiers from real councils
-└── wise-counsil/        ← THE INSTALLABLE SKILL PACKAGE (self-contained)
+└── wise-counsel/        ← THE INSTALLABLE SKILL PACKAGE (self-contained)
     ├── SKILL.md         ← skill definition: triggers, modes, templates
     ├── config/
-    │   ├── wisecounsil.json   ← live roster + limits (source of truth)
+    │   ├── WiseCounsel.json   ← live roster + limits (source of truth)
     │   └── presets.json       ← balanced-six / free-six / pair-minimum
     └── scripts/
-        ├── Invoke-WiseCounsil.ps1   ← Door A engine (OpenRouter, parallel)
-        └── Install-WiseCounsil.ps1  ← installs package into skill dirs
+        ├── Invoke-WiseCounsel.ps1   ← Door A engine (OpenRouter, parallel)
+        └── Install-WiseCounsel.ps1  ← installs package into skill dirs
 ```
 
-Installed copies live at `~/.config/opencode/skills/wise-counsil/` (OpenCode)
-and `~/.claude/skills/wise-counsil/` (Claude Code). The repo copy is the
+Installed copies live at `~/.config/opencode/skills/wise-counsel/` (OpenCode)
+and `~/.claude/skills/wise-counsel/` (Claude Code). The repo copy is the
 source of truth; re-run the installer after editing the repo copy, or edit an
 installed copy directly for quick experiments.
 
@@ -57,13 +57,13 @@ installed copy directly for quick experiments.
 
 ## How to modify things
 
-- **Roster/models**: edit `wise-counsil/config/wisecounsil.json` (2–6 models,
-  diverse families preferred), then run `Install-WiseCounsil.ps1` to validate
+- **Roster/models**: edit `wise-counsel/config/WiseCounsel.json` (2–6 models,
+  diverse families preferred), then run `Install-WiseCounsel.ps1` to validate
   IDs against the live OpenRouter catalog and re-sync installed copies.
-- **Prompt templates / protocol**: edit `wise-counsil/SKILL.md`. Keep the
+- **Prompt templates / protocol**: edit `wise-counsel/SKILL.md`. Keep the
   "max N words" and "phrase uncertain items as Verify:" rules — they are load-
   bearing against hallucination contamination and context bloat.
-- **Engine script**: edit `Invoke-WiseCounsil.ps1`, then (a) syntax-check with
+- **Engine script**: edit `Invoke-WiseCounsel.ps1`, then (a) syntax-check with
   `[System.Management.Automation.Language.Parser]::ParseFile`, (b) smoke-test
   with the `free-six` or a 2-member `:free` override, zero cost.
 

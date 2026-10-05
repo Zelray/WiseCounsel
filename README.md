@@ -9,7 +9,7 @@ frontier model writes a line of code. You answer a handful of build-changing
 questions; the frontier model gets an enriched brief instead of guessing in
 silence. A full council costs **~$0.003** and takes ~15–45 seconds.
 
-[![ci](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![ci](https://github.com/Zelray/WiseCounsil/actions/workflows/ci.yml/badge.svg)](https://github.com/Zelray/WiseCounsil/actions/workflows/ci.yml)
 
 It also runs **debates** (six models take positions, then rebut each other
 anonymously) and **plan critiques** (cheap models attack your plan before you
@@ -62,7 +62,7 @@ harness in `eval/` is built to answer it honestly.
 ## Install
 
 ```powershell
-git clone <this repo> WiseCounsil
+git clone https://github.com/Zelray/WiseCounsil.git WiseCounsil
 cd WiseCounsil\wise-counsil
 pwsh -File scripts\Install-WiseCounsil.ps1
 ```

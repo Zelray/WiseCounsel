@@ -28,8 +28,7 @@
 | Engine `-OutDir` default writes inside the package (wise-counsil/runs/) | 🟡 known; gitignored (unanchored `runs/` rule); fix scheduled AFTER the eval — package is the frozen measured artifact |
 
 ## Next steps
-1. **Mike decides wave 2** (~$2–5, ~2–4 h): confirmatory run with 30 calibrated tasks + sham-context & compute-matched arms.
-2. Create the GitHub repo (Mike's account) and push; fix README badge URLs.
-3. Before wave 2: harden the solution-fence parser (2 baseline runs lost to it in the pilot — disclosed in RESULTS.md); replace the ceiling Track-2 task.
-4. Exercise `debate` mode end-to-end.
-5. Build + test Door B (OpenCodeGo subagents) inside OpenCode.
+1. **Wave 2 (confirmatory run)** — ⏭️ **START HERE in a fresh session: read `HANDOFF-WAVE2.md`** (exhaustive instructions: prep, 24+3 new tasks, arms E+F, freeze v2, launch commands, analysis, publish steps). Owner decision on ~$2.50–4.00 spend happens inside that flow.
+2. Create the GitHub repo (Mike's account) and push; fix README badge URLs. *(§6 of HANDOFF-WAVE2 — after the wave-2 verdict.)*
+3. Exercise `debate` mode end-to-end.
+4. Build + test Door B (OpenCodeGo subagents) inside OpenCode.

@@ -199,5 +199,79 @@ addendum before data collection.*
 
 ## Preregistration addenda
 
-(none yet — this section records any post-freeze, pre-launch changes with
-dates and reasons; after data collection begins, no edits.)
+### Wave-2 addendum (2026-10-05)
+
+Recorded BEFORE any wave-2 data collection. Everything above this addendum
+remains in force except as explicitly modified here.
+
+**Scope.** The pilot's wave-2 gate (pilot B−A ≥ +10 pp with p < 0.10) did not
+fire by its letter (pilot B−A = +15.8 pp, p = 0.125). We scale anyway as a
+separately approved, separately budgeted confirmatory run because the point
+estimate cleared +10 pp, the pilot was powered only for large effects, and H2
+is untested at n = 6. The pilot's 6 Track-1 tasks are re-run fresh inside
+wave 2 and wave 2 supersedes pilot numbers in all public claims; the pilot's
+numbers are kept as history only.
+
+- **Tasks.** Track 1: 30 tasks (the 6 pilot tasks re-run + 24 new, numbered
+  09+; archetype spread 5 calculators, 5 validators, 5 state machines,
+  5 date/aggregation, 4 mixed). Track 2: 5 tasks (payment-processor kept;
+  the storage-ADR task is REPLACED — it ceilinged at 1.0 for every arm in
+  the pilot and cannot discriminate; 4 new, harder decision tasks authored,
+  6-dimension rubrics each). New tasks are authored model-assisted under the
+  same blind rule (`provenance.authored_by: "model-assisted,
+  council-design-blind"`), difficulty-calibrated before the freeze (one
+  executor call on the public brief alone per NEW Track-1 task, ~$0.002
+  each; tasks outside the 30–70% baseline band are rewritten or discarded
+  before freezing; scores recorded in `eval/tasks/CALIBRATION-wave2.md`).
+- **Arms.** A, B, C, E, F. **Arm D is dropped** (pilot showed single-critic
+  ≈ council; dropping it saves spend without losing a planned claim).
+- **Repetitions.** Track 1: 30 × 5 × 2 = 300 runs. Track 2: 5 × 5 × 1 = 25
+  runs, 3-judge panel as pre-registered.
+- **Primary comparison (confirmatory): B − C** — the council-vs-self-questions
+  ablation (H2). Test: exact paired sign-flip permutation on 30 task-level
+  deltas (n > 16: 10,000 random sign flips, seed 42, as implemented in the
+  committed analyzer). Two-sided, p < 0.05.
+- **Secondary comparisons, pre-stated hierarchy (nominal p-values):**
+  B − A, C − A, B − E, B − F, E − A, F − A. All are reported; none may be
+  headlined over B − C.
+- **Decision rule (verbatim, pre-committed):** "council earns its keep" =
+  B − C ≥ +5 pp AND p < 0.05 AND bootstrap CI excludes 0. A null or negative
+  B − C is published exactly as a positive one would be.
+- **Arm E mechanics.** Per task index i (fixed task order), the council runs
+  once on task (i+1 mod n)'s public brief; that dossier feeds task i's
+  synthesis; all other steps identical to arm B. One sham council call per
+  task, generated once and reused across that task's repetitions. Deviation
+  from the earlier sketch: dossiers are NOT artificially padded to matching
+  length — the sham dossier's length and arm B's dossier length are both
+  logged and reported instead, because truncation/padding risks corrupting
+  the "realistic extra text" property being tested. If the sham council call
+  fails, the run proceeds without enrichment and is flagged, same as arm B's
+  council-failure rule.
+- **Arm F mechanics.** Three independent `executor build` calls on the plain
+  brief (no answers, identical scaffold to arm A), then one selection call
+  (executor model, temperature 0: "reply with ONLY the number 1-3 of the
+  solution that best satisfies the brief"), then the selected solution is
+  extracted and graded exactly like every other arm. All three candidate
+  responses and the selector output are logged per run. Pre-stated fallback:
+  if the selector's reply does not contain a digit 1–3, candidate 1 is
+  selected and the run is flagged `selection-invalid`. Actual token counts
+  and cost are disclosed against arm B's in RESULTS (compute matching is
+  empirical, not engineered to a target).
+- **Parser hardening (pre-data correction).** The pilot lost 2 baseline runs
+  to unclosed ```python fences in the whole-content fallback of the solution
+  extractor. Fix (in the harness, which is not part of the frozen artifact):
+  when no closed fence matches, strip leading/trailing bare fence lines from
+  the whole-content fallback. This changes extraction only for malformed
+  responses and cannot move any arm's content.
+- **Freeze.** Wave-2 freeze manifest: `eval/FROZEN-HASHES-wave2.txt`, created
+  after suite finalization and before any wave-2 council/executor call. The
+  pilot manifest `eval/FROZEN-HASHES.txt` is untouched and remains the
+  pilot's historical record; after wave-2 task files land, the pilot
+  manifest necessarily no longer matches the tree (the wave-2 manifest is
+  the live oracle). `wise-counsil/` is unchanged and byte-identical in both
+  manifests.
+- **Budget.** Expected spend $2.50–4.00 (pilot Track-1 cost $0.24 at 48 runs
+  scaled ×6.25, plus arm F's extra calls, plus Track-2 judging ≈ $0.4).
+  **Hard cap $8.00** enforced at launch via `-MaxSpendUsd 8` (harness aborts,
+  exit 4, preserving completed runs). Calibration spend (~24 × $0.002) is
+  suite-construction cost, disclosed here, spent before the freeze.

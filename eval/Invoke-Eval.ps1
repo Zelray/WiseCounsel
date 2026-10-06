@@ -44,6 +44,7 @@ $ProgressPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
 $evalRoot = $PSScriptRoot
+. "$PSScriptRoot/common.ps1"
 $repoRoot = Split-Path -Parent $evalRoot
 if (-not $ConfigPath) { $ConfigPath = Join-Path $evalRoot 'config.json' }
 $cfg = Get-Content -LiteralPath $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -53,11 +54,7 @@ if ($MaxSpendUsd -le 0) { $MaxSpendUsd = [double]$cfg.budget.maxSpendUsd }
 # --- key (real mode only; NEVER printed) --------------------------------------
 $key = ''
 if (-not $Mock) {
-  if ($env:OPENROUTER_API_KEY) { $key = $env:OPENROUTER_API_KEY }
-  else {
-    $keyFile = Join-Path $HOME '.openrouter-client.key'
-    if (Test-Path -LiteralPath $keyFile) { $key = (Get-Content -LiteralPath $keyFile -Raw).Trim() }
-  }
+  $key = Get-OpenRouterKey
   if (-not $key) { Write-Host 'ERROR: no OpenRouter key (set OPENROUTER_API_KEY or ~\.openrouter-client.key)'; exit 3 }
 }
 
@@ -332,6 +329,22 @@ function Get-DeliveredAnswers {
   return $lines
 }
 
+function Add-Enrichment {
+  # Shared B/C/D/E enrichment tail: synthesis -> matcher -> delivered answers
+  # written into the run dir. Mutates the caller's flags list on failure.
+  param([object]$Card, [string]$RunDir, [string]$Dossier, [object]$Flags)
+  $syn = Invoke-SynthesisStep -Card $Card -RunDir $RunDir -Dossier $Dossier
+  if (-not $syn.ok) {
+    $Flags.Add('synthesis-failed')
+    return @{ cost = $syn.cost; questions = @(); answerLines = @() }
+  }
+  $questions = $syn.questions
+  $match = Invoke-MatcherStep -Card $Card -Questions $questions -RunDir $RunDir
+  $answerLines = Get-DeliveredAnswers -Card $Card -Questions $questions -Mapping $match.mapping
+  $answerLines | Set-Content (Join-Path $RunDir 'answers-delivered.txt') -Encoding UTF8
+  return @{ cost = $syn.cost + $match.cost; questions = $questions; answerLines = $answerLines }
+}
+
 function Invoke-BuildStep {
   # PurposeSuffix (arm F only): disambiguates the logged prompts/responses of
   # the three independent candidate builds (-f1/-f2/-f3) inside one run dir.
@@ -371,18 +384,6 @@ function Invoke-SelectionStep {
   $m = [regex]::Match($r.content, '[123]')
   if (-not $m.Success) { return @{ index = 1; raw = $r.content; cost = $r.cost; flag = 'selection-invalid' } }
   return @{ index = [int]$m.Value; raw = $r.content.Trim(); cost = $r.cost; flag = '' }
-}
-
-function Get-Track1Solution([string]$content, [string]$RunDir) {
-  $m = [regex]::Match($content, '(?s)```python\s*(.*?)```')
-  # Whole-content fallback: strip bare/unclosed fence lines so a response that
-  # opens a fence but never closes it cannot poison the graded file (this
-  # zeroed 2 pilot baseline runs; see wave-2 addendum).
-  $code = if ($m.Success) { $m.Groups[1].Value }
-          else { ($content -replace '(?m)^\s*```(python)?\s*$', '').Trim() }
-  $p = Join-Path $RunDir 'solution.py'
-  Set-Content -LiteralPath $p -Value $code -Encoding UTF8
-  return $p
 }
 
 function Invoke-GradeTrack1 {
@@ -478,39 +479,18 @@ foreach ($slot in $schedule) {
     $c = Invoke-CouncilStep -Card $card -RunDir $runDir
     $runCost += $c.cost
     if ($c.exit -ne 0) { $flags.Add('council-failed') } else {
-      $syn = Invoke-SynthesisStep -Card $card -RunDir $runDir -Dossier $c.dossier
-      $runCost += $syn.cost
-      if (-not $syn.ok) { $flags.Add('synthesis-failed') } else {
-        $questions = $syn.questions
-        $match = Invoke-MatcherStep -Card $card -Questions $questions -RunDir $runDir
-        $runCost += $match.cost
-        $answerLines = Get-DeliveredAnswers -Card $card -Questions $questions -Mapping $match.mapping
-        $answerLines | Set-Content (Join-Path $runDir 'answers-delivered.txt') -Encoding UTF8
-      }
+      $e = Add-Enrichment -Card $card -RunDir $runDir -Dossier $c.dossier -Flags $flags
+      $runCost += $e.cost; $questions = $e.questions; $answerLines = $e.answerLines
     }
   } elseif ($arm -eq 'C') {
-    $syn = Invoke-SynthesisStep -Card $card -RunDir $runDir -Dossier ''
-    $runCost += $syn.cost
-    if (-not $syn.ok) { $flags.Add('synthesis-failed') } else {
-      $questions = $syn.questions
-      $match = Invoke-MatcherStep -Card $card -Questions $questions -RunDir $runDir
-      $runCost += $match.cost
-      $answerLines = Get-DeliveredAnswers -Card $card -Questions $questions -Mapping $match.mapping
-      $answerLines | Set-Content (Join-Path $runDir 'answers-delivered.txt') -Encoding UTF8
-    }
+    $e = Add-Enrichment -Card $card -RunDir $runDir -Dossier '' -Flags $flags
+    $runCost += $e.cost; $questions = $e.questions; $answerLines = $e.answerLines
   } elseif ($arm -eq 'D') {
     $c = Invoke-CriticStep -Card $card -RunDir $runDir
     $runCost += $c.cost
     if ($c.exit -ne 0) { $flags.Add('critic-failed') } else {
-      $syn = Invoke-SynthesisStep -Card $card -RunDir $runDir -Dossier $c.dossier
-      $runCost += $syn.cost
-      if (-not $syn.ok) { $flags.Add('synthesis-failed') } else {
-        $questions = $syn.questions
-        $match = Invoke-MatcherStep -Card $card -Questions $questions -RunDir $runDir
-        $runCost += $match.cost
-        $answerLines = Get-DeliveredAnswers -Card $card -Questions $questions -Mapping $match.mapping
-        $answerLines | Set-Content (Join-Path $runDir 'answers-delivered.txt') -Encoding UTF8
-      }
+      $e = Add-Enrichment -Card $card -RunDir $runDir -Dossier $c.dossier -Flags $flags
+      $runCost += $e.cost; $questions = $e.questions; $answerLines = $e.answerLines
     }
   } elseif ($arm -eq 'E') {
     # Sham context: the dossier comes from the NEXT task in the fixed order
@@ -526,15 +506,8 @@ foreach ($slot in $schedule) {
     }
     $dossier = $script:ShamDossiers[$donor.task_id]
     if ($dossier) {
-      $syn = Invoke-SynthesisStep -Card $card -RunDir $runDir -Dossier $dossier
-      $runCost += $syn.cost
-      if (-not $syn.ok) { $flags.Add('synthesis-failed') } else {
-        $questions = $syn.questions
-        $match = Invoke-MatcherStep -Card $card -Questions $questions -RunDir $runDir
-        $runCost += $match.cost
-        $answerLines = Get-DeliveredAnswers -Card $card -Questions $questions -Mapping $match.mapping
-        $answerLines | Set-Content (Join-Path $runDir 'answers-delivered.txt') -Encoding UTF8
-      }
+      $e = Add-Enrichment -Card $card -RunDir $runDir -Dossier $dossier -Flags $flags
+      $runCost += $e.cost; $questions = $e.questions; $answerLines = $e.answerLines
     }
   }
   ConvertTo-Json -InputObject @($questions) | Set-Content (Join-Path $runDir 'questions.json') -Encoding UTF8
@@ -562,7 +535,7 @@ foreach ($slot in $schedule) {
     $flags.Add('executor-failed')
   } else {
     if ($card.track -eq 1) {
-      $solPath = Get-Track1Solution -content $build.content -RunDir $runDir
+      $solPath = Get-FencedPython -Content $build.content -RunDir $runDir
       if (-not (Test-Path $solPath)) { $flags.Add('no-solution') } else {
         $g = Invoke-GradeTrack1 -Card $card -SolutionPath $solPath -RunDir $runDir
         $score = $g.score; $passed = $g.passed; $total = $g.total
@@ -591,7 +564,6 @@ foreach ($slot in $schedule) {
     arm = $arm; task_id = $card.task_id; track = $card.track; rep = $rep
     score = $score; passed = $passed; total = $total
     questions_asked = $questions.Count
-    council_exit = $null
     sham_donor_task = $shamDonorTask
     cost_usd = [math]::Round($runCost, 6); latency_ms = $build.latencyMs
     mock = [bool]$Mock

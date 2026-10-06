@@ -21,5 +21,8 @@ HANDOFF-*.md
 # this repo's deliverable.
 .claude/
 
+# Local acceptance-gate ledgers and audit tooling (machine-specific paths).
+.unlazy/
+
 # Python bytecode from the eval graders (tests run candidate solutions).
 __pycache__/

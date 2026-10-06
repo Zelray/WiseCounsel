@@ -30,17 +30,13 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $evalRoot = $PSScriptRoot
+. "$PSScriptRoot/common.ps1"
 $tasksDir = Join-Path $evalRoot 'tasks'
 if (-not $OutFile) { $OutFile = Join-Path $tasksDir 'CALIBRATION-wave2.md' }
 if (-not $ResultsDir) { $ResultsDir = Join-Path $evalRoot 'results' }
 
 # --- key (never printed) -------------------------------------------------------
-$key = ''
-if ($env:OPENROUTER_API_KEY) { $key = $env:OPENROUTER_API_KEY }
-else {
-  $keyFile = Join-Path $HOME '.openrouter-client.key'
-  if (Test-Path -LiteralPath $keyFile) { $key = (Get-Content -LiteralPath $keyFile -Raw).Trim() }
-}
+$key = Get-OpenRouterKey
 if (-not $key) { Write-Host 'ERROR: no OpenRouter key (set OPENROUTER_API_KEY or ~\.openrouter-client.key)'; exit 3 }
 
 $cfg = Get-Content -LiteralPath (Join-Path $evalRoot 'config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -96,16 +92,6 @@ function Invoke-ExecutorCall {
   }
 }
 
-function Get-Solution([string]$content, [string]$RunDir) {
-  # Same hardened fence logic as eval/Invoke-Eval.ps1 Get-Track1Solution.
-  $m = [regex]::Match($content, '(?s)```python\s*(.*?)```')
-  $code = if ($m.Success) { $m.Groups[1].Value }
-          else { ($content -replace '(?m)^\s*```(python)?\s*$', '').Trim() }
-  $p = Join-Path $RunDir 'solution.py'
-  Set-Content -LiteralPath $p -Value $code -Encoding UTF8
-  return $p
-}
-
 $rows = foreach ($t in $targets) {
   $card = $t.card
   $runDir = Join-Path $rawRoot $card.task_id
@@ -115,7 +101,7 @@ $rows = foreach ($t in $targets) {
   if (-not $r.ok) {
     $flag = 'executor-failed'
   } else {
-    $solPath = Get-Solution -content $r.content -RunDir $runDir
+    $solPath = Get-FencedPython -Content $r.content -RunDir $runDir
     $slug = $card.task_id -replace '^T[12]-', ''
     $checker = Get-ChildItem (Join-Path $evalRoot 'tasks') -Filter "check-*-$slug.ps1" | Select-Object -First 1
     if (-not $checker) { $flag = 'checker-missing' } else {

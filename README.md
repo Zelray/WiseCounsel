@@ -43,31 +43,16 @@ That story in 90 seconds:
 
 ## What shipped
 
-**`clarify` (the default; $0):** say **"wise counsel"** before a big task
-and your frontier model generates up to 5 build-changing questions about
-your brief, asks you, and merges your answers into an enriched brief with a
-verify-later checklist — no sub-models, no API calls, no latency hit.
-
-**The council (opt-in):** say **"convene the council"** and 2–6 cheap or
-free models fire **in parallel** and *attack* your brief. A full council
-costs **~$0.003** and takes ~15–45 seconds. It also runs **debates** (six
-models take positions, then rebut each other anonymously) and **plan
-critiques** (cheap models attack your plan before you execute it).
+One default mode — `clarify`, $0 — and an opt-in council, plus debate and
+plan-critique modes. Wording, usage, and prices: [Use](#use) · [Cost](#cost).
 
 ## Evidence
 
 **Wave-2 confirmatory result (300 runs, 30 calibrated tasks, 5 arms, ~$2.21
-billed, 2026-10-05):** briefs enriched with answered open questions lifted
-the executor's first-attempt pass rate **+13.2 points** (44.8% → 58.0%,
-p = 0.0002) over baseline and beat compute-matched best-of-3-with-selection,
-which gained **exactly zero** over a single attempt. The confirmatory
-primary comparison — council vs the executor asking its own questions — came
-in at **B − C = −0.5 points (95% CI [−5.7, +4.5], p = 0.90)**, and a sham
-dossier built from a *different* task performed identically to the real
-one. Per the pre-registered decision rule this is a **null on the council
-premium**, published here exactly as a positive would be. (A further 25
-Track-2 decision-brief runs were mechanically unreliable and are reported
-as unvalidated — see docs/RESULTS.md.)
+billed, 2026-10-05):** the numbers in the 90-second summary above hold as
+the confirmatory result — scaffold lift real, council premium null, sham
+indistinguishable from real. Full per-arm tables, statistics, caveats, and
+the unvalidated Track-2 runs: [docs/RESULTS.md](docs/RESULTS.md).
 
 - **Arms:** baseline (brief alone) · council (the shipping skill) ·
   self-questions (the executor asks its own questions — the ablation) ·

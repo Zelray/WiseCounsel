@@ -8,7 +8,7 @@
   n=16), 95% percentile bootstrap CI (10,000 resamples, seed 42), arm cost
   and latency, council health, and the B-vs-C question-overlap diversity
   audit. Reads ONLY eval/results/manifest.jsonl and the raw run dirs — no
-  hand-typed numbers. Writes summary.md + summary.csv next to the manifest.
+  hand-typed numbers. Writes summary.md next to the manifest.
 .EXAMPLE
   pwsh -File eval/Invoke-Analyze.ps1                       # latest experiment
   pwsh -File eval/Invoke-Analyze.ps1 -ExpId exp-20261001-120000
@@ -157,10 +157,6 @@ if ($null -ne $overlap) { [void]$sb.AppendLine("## Diversity audit: mean B-vs-C 
 
 $summaryPath = Join-Path $ResultsDir 'summary.md'
 Set-Content -LiteralPath $summaryPath -Value $sb.ToString() -Encoding UTF8
-
-$csv = Join-Path $ResultsDir 'summary.csv'
-$rows | Select-Object expid, arm, task_id, rep, score, passed, total, questions_asked, cost_usd, latency_ms, mock, leak |
-  ForEach-Object { [pscustomobject]$_ } | Export-Csv -LiteralPath $csv -NoTypeInformation -Encoding UTF8
 
 Write-Host "ANALYZE-OK expid=$ExpId summary=$summaryPath"
 exit 0

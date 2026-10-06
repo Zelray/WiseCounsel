@@ -30,23 +30,11 @@ for the operating protocol.
 
 ## Structure map
 
-```
-WiseCounsel/
-├── Agents.md            ← this file (canonical conventions)
-├── CLAUDE.md            ← thin pointer for Claude Code sessions
-├── README.md            ← plain-English pitch + quickstart (PM-readable)
-├── STATUS.md            ← one-glance status chart (consumed by Joey)
-├── docs/DESIGN.md       ← design rationale, failure modes, roadmap
-├── runs/                ← (gitignored) dossiers from real councils
-└── wise-counsel/        ← THE INSTALLABLE SKILL PACKAGE (self-contained)
-    ├── SKILL.md         ← skill definition: triggers, modes, templates
-    ├── config/
-    │   ├── WiseCounsel.json   ← live roster + limits (source of truth)
-    │   └── presets.json       ← balanced-six / free-six / pair-minimum
-    └── scripts/
-        ├── Invoke-WiseCounsel.ps1   ← Door A engine (OpenRouter, parallel)
-        └── Install-WiseCounsel.ps1  ← installs package into skill dirs
-```
+`wise-counsel/` is the installable skill package (SKILL.md, config/, scripts/);
+`eval/` is the measurement harness (drivers, task suite, frozen hashes,
+results); `docs/` holds DESIGN, EVAL-DESIGN, and RESULTS; `STATUS.md` is the
+one-glance chart. Run `git ls-files` for the authoritative list —
+hand-maintained trees drift (this one had already omitted half of `eval/`).
 
 Installed copies live at `~/.config/opencode/skills/wise-counsel/` (OpenCode)
 and `~/.claude/skills/wise-counsel/` (Claude Code). The repo copy is the

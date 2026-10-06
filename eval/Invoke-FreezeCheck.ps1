@@ -14,16 +14,15 @@
 [CmdletBinding()]
 param(
   [switch]$Update,
-  # Wave 2 freezes into a separate manifest (FROZEN-HASHES-wave2.txt); the
-  # pilot's manifest is a historical record this script never overwrites.
-  [string]$ManifestPath = ''
+  # Manifest is always explicit: no default that could silently point at a
+  # dead historical freeze (the pilot manifest can never verify again).
+  [Parameter(Mandatory)] [string]$ManifestPath
 )
 
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $evalRoot = $PSScriptRoot
 $repoRoot = Split-Path -Parent $evalRoot
-if (-not $ManifestPath) { $ManifestPath = Join-Path $evalRoot 'FROZEN-HASHES.txt' }
 
 $targets = @()
 $targets += Get-ChildItem (Join-Path $repoRoot 'wise-counsel') -Recurse -File |

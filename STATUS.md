@@ -5,7 +5,7 @@
 
 | Item | Status |
 |---|---|
-| Version | **v0.2.0** (2026-10-05) — clarify-default pivot |
+| Version | **v0.2.1** (2026-10-05) — ponytail hygiene pass (applied in working tree, **uncommitted pending owner review**) |
 | Skill definition (`SKILL.md`: triggers, **4 modes — `clarify` DEFAULT + 3 opt-in council modes**, 4 council templates + clarify protocol) | ✅ ships (v0.2.0; council templates byte-unchanged from v0.1.0) |
 | Clarify mode (frontier model generates ≤5 build-changing questions → user answers → enriched brief + verify-later; **$0, no sub-models**) | ✅ shipped 2026-10-05, live-exercised in-session (GATES-V02 V7) |
 | Council modes (`premortem` / `critique` / `debate`) | ✅ working, now **OPT-IN only** ("convene the council") per wave-2 null |
@@ -28,6 +28,7 @@
 | Wave-2 confirmatory run | ✅ (history): scaffold +13.2 pp (p=0.0002) confirmed; council premium NULL (B−C −0.5 pp, p=0.90); full read docs/RESULTS.md |
 | Public-repo readiness + GitHub | ✅ published v0.1.0 (2026-10-05, CI green); v0.2.0 tagged; **README re-led as a case study + DECISION-MEMO.md (founder voice, owner-approved) — commit 5de6c98, CI green** |
 | Engine `-OutDir` default writes inside the package (wise-counsel/runs/) | 🟡 still known; gitignored; **follow-up candidate now that the eval is done** (not in v0.2.0 scope) |
+| Ponytail hygiene pass v0.2.1 (9 non-freeze cuts, net −455: CI parse step, summary.csv + writer, pilot-launch.log, council_exit, FreezeCheck dead default, Eval 4×-block → `Add-Enrichment`, `eval/common.ps1` key+fence dedup, README/Agents dedup) | ✅ applied 2026-10-05, **uncommitted pending owner review**; gates H0–H7 ALL MET (DRYRUN-SMOKE-PASSED · GRADERS-VERIFIED · parse clean · pins untouched) — `HANDOFF-2026-10-05-PONYTAIL-AUDIT.md` |
 
 ## Next steps
 1. **Portfolio content stream — START HERE: read `HANDOFF-2026-10-05-NEXT-STEPS.md`** (blog post → screen capture → MLO ops note → applications; four items, Mike-approved order).
@@ -35,3 +36,4 @@
 3. Exercise `debate` mode end-to-end.
 4. Build + test Door B (OpenCodeGo subagents) inside OpenCode.
 5. Follow-up candidate: fix engine `-OutDir` default (package no longer frozen by an active measurement).
+6. Freeze-list backlog (ponytail audit, −4,174 + 13 lines): grader/tests consolidation + hidden_spec/field/pointer cuts across the corpus, the premortem third copy, and the installer catalog probe — only worth doing at the already-sanctioned v4 re-freeze if another measurement wave is ever planned; otherwise leave the published measurement untouched.

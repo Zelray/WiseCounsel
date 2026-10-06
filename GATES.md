@@ -36,6 +36,7 @@ with the shipping skill package byte-identical throughout.
   CHECK: pwsh -NoProfile -File eval/Invoke-FreezeCheck.ps1
   EXPECT: FREEZE-INTACT
   EVIDENCE: 2026-10-01 — `FREEZE-CREATED (33 files)` then `FREEZE-INTACT (33 files match the pre-registration freeze)`. Manifest: eval/FROZEN-HASHES.txt (committed with the repo; created before any data collection).
+  ADDENDUM 2026-10-05 — this gate's oracle is RETIRED, not replayable: `Invoke-FreezeCheck.ps1` now requires an explicit `-ManifestPath` (v0.2.1), and the pilot manifest it pointed at can no longer verify by design (superseded by FROZEN-HASHES-v3.txt; see STATUS.md freeze row). Historical result stands.
 
 - [x] G6: Public-readiness artifacts exist: LICENSE, CI workflow, README with Evidence section, .gitignore covers eval raw outputs
   CHECK: pwsh -NoProfile -Command "$need = @('LICENSE','.github/workflows/ci.yml'); $miss = @($need | Where-Object { -not (Test-Path $_) }); $rd = Get-Content 'README.md' -Raw; $gi = Get-Content '.gitignore' -Raw; if ($miss.Count -eq 0 -and $rd -match 'Evidence' -and $gi -match 'eval') { 'PUBLIC-READY' } else { \"MISSING: $($miss -join ',') readme-evidence=$($rd -match 'Evidence') gitignore=$($gi -match 'eval')\"; exit 1 }"

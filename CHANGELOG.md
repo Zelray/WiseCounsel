@@ -4,6 +4,35 @@ All notable changes to WiseCounsel. Format: loose Keep-a-Changelog; dates are
 US-independent (ISO). Versioning per `Agents.md`: patch for config/roster/doc
 changes, minor for new modes or doors.
 
+## v0.2.1 — 2026-10-05
+
+Hygiene pass from the 2026-10-05 ponytail audit (whole-repo over-engineering
+review): 9 freeze-safe cuts, net −455 lines, zero behavior change — offline
+end-to-end mock pipeline re-run green (DRYRUN-SMOKE-PASSED), all 30 Track-1
+graders re-verified (GRADERS-VERIFIED), freeze-manifest drift set unchanged.
+
+### Removed
+- `eval/results/summary.csv` and its writer in `Invoke-Analyze.ps1` — a
+  write-only lossy copy of `manifest.jsonl`, zero readers.
+- `eval/results/pilot-launch.log` — unreferenced, superseded session log
+  (the 56 pilot rows live in the manifest; the file remains in git history).
+- CI "Parse all PowerShell scripts" step — PSScriptAnalyzer already fails
+  the build on parse errors.
+- The always-null `council_exit` manifest field (zero non-null values in
+  all 381 recorded rows; historical rows keep it).
+
+### Changed
+- `Invoke-Eval.ps1`: the 4× repeated synthesis→matcher→answers block is now
+  one `Add-Enrichment` helper; the OpenRouter key loader and the
+  fenced-python extractor moved to a new dot-sourced `eval/common.ps1`,
+  deduplicating `Invoke-Calibrate.ps1`.
+- `Invoke-FreezeCheck.ps1`: `-ManifestPath` is now mandatory — the old
+  silent default pointed at the pilot manifest, which can never verify again
+  (the live oracle is `FROZEN-HASHES-v3.txt`).
+- README / Agents.md: self-duplicated zones collapsed to pointers;
+  Agents.md's hand-maintained structure tree (already silently drifted)
+  replaced by a `git ls-files` pointer.
+
 ## v0.2.0 — 2026-10-05
 
 The product pivot after the wave-2 confirmatory eval (300 runs, 30 calibrated

@@ -16,19 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Parse all PowerShell scripts
-        shell: pwsh
-        run: |
-          $fails = @()
-          $scripts = @(Get-ChildItem -Recurse -Filter *.ps1)
-          foreach ($s in $scripts) {
-            $t = $null; $e = $null
-            [System.Management.Automation.Language.Parser]::ParseFile($s.FullName, [ref]$t, [ref]$e) | Out-Null
-            if ($e.Count -gt 0) { $fails += "$($s.Name): $($e[0].Message)" }
-          }
-          if ($fails.Count -gt 0) { $fails; exit 1 }
-          "PARSE-CLEAN ($($scripts.Count) scripts)"
-
       - name: Validate JSON (configs + task cards)
         shell: pwsh
         run: |

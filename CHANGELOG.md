@@ -4,6 +4,17 @@ All notable changes to WiseCounsel. Format: loose Keep-a-Changelog; dates are
 US-independent (ISO). Versioning per `Agents.md`: patch for config/roster/doc
 changes, minor for new modes or doors.
 
+## v0.2.2 — 2026-10-06
+
+Docs-only. DECISION-MEMO gains a dated postscript: the day-after observation
+that Matt Pocock's popular `grilling` skill is the experiment's winning arm
+(question-first scaffold) built as craft — demand-side evidence for the
+measured pattern, with the honest boundaries stated (post-hoc discovery, not
+a measurement of that skill) and the chapter-two candidate it suggests
+(single-pass vs rounds-based clarify; pre-registerable, single-model, ~$0).
+
+No code, config, or measurement changes.
+
 ## v0.2.1 — 2026-10-05
 
 Hygiene pass from the 2026-10-05 ponytail audit (whole-repo over-engineering

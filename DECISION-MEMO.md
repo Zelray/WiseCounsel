@@ -49,3 +49,34 @@ this repo. I told them what to build, set the approval gates, capped and
 audited every dollar, made the kill call, and wrote this memo. If you are
 hiring for judgment under uncertainty, that division of labor is the
 résumé — not a confession.
+
+**Postscript, day two (2026-10-06): the market ran my control arm.**
+
+The day after publishing this, while closing out a repo audit, I reached for
+a grilling skill and noticed something I had not thought about when I set
+the $8 cap: the most popular questioning skill in the AI ecosystem right
+now — Matt Pocock's "grilling" — is my experiment's winning arm, built as
+craft. One model stops. It interviews you relentlessly. Every question
+carries a recommended answer. Nothing gets built until the two of you agree
+on what is being built. That is arm C: the scaffold that lifted
+first-attempt pass rate 13.2 points, while my council of six models added
+nothing over it and three-times-the-compute best-of-3 gained exactly zero.
+
+Be clear about what this is and isn't. I did not design the experiment
+around grilling — I found the connection the day after publishing, and
+nothing in my data measures his skill. What it is, is demand-side evidence
+for the pattern my data isolated: the industry's favorite prompting tool
+works because questions-before-building is the active ingredient — the
+conclusion I had to spend $2.21 and 325 runs to earn, the market arrived at
+by shipping and watching what people adopt.
+
+Credit where due, too: as questioning craft, grilling is ahead of my
+clarify mode. It asks in dependency order — foundations first, only
+questions answerable now — across multiple rounds, until the decision tree
+has no unsettled frontier. My clarify is a single pass of five questions.
+That structure is copyable for free, and it is the obvious chapter-two
+experiment: single-pass clarify against rounds-based clarify, one model,
+pre-registered, pennies. It is written down as a candidate, not committed
+to. I know what happens to my untested favorite ideas now: sometimes
+they're placebos with good formatting. The difference is that checking
+costs almost nothing — and the checking is the product.

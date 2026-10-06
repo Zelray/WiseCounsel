@@ -5,7 +5,7 @@
 
 | Item | Status |
 |---|---|
-| Version | **v0.2.1** (2026-10-05) — ponytail hygiene pass (applied in working tree, **uncommitted pending owner review**) |
+| Version | **v0.2.2** (2026-10-06) — decision-memo postscript: grilling-is-arm-C observation (docs-only; commit pending owner go) |
 | Skill definition (`SKILL.md`: triggers, **4 modes — `clarify` DEFAULT + 3 opt-in council modes**, 4 council templates + clarify protocol) | ✅ ships (v0.2.0; council templates byte-unchanged from v0.1.0) |
 | Clarify mode (frontier model generates ≤5 build-changing questions → user answers → enriched brief + verify-later; **$0, no sub-models**) | ✅ shipped 2026-10-05, live-exercised in-session (GATES-V02 V7) |
 | Council modes (`premortem` / `critique` / `debate`) | ✅ working, now **OPT-IN only** ("convene the council") per wave-2 null |

@@ -31,7 +31,7 @@
 | Ponytail hygiene pass v0.2.1 (9 non-freeze cuts, net −455: CI parse step, summary.csv + writer, pilot-launch.log, council_exit, FreezeCheck dead default, Eval 4×-block → `Add-Enrichment`, `eval/common.ps1` key+fence dedup, README/Agents dedup) | ✅ applied 2026-10-05, **uncommitted pending owner review**; gates H0–H7 ALL MET (DRYRUN-SMOKE-PASSED · GRADERS-VERIFIED · parse clean · pins untouched) — `HANDOFF-2026-10-05-PONYTAIL-AUDIT.md` |
 
 ## Next steps
-1. **Portfolio content stream — START HERE: read `HANDOFF-2026-10-05-NEXT-STEPS.md`** (blog post → screen capture → MLO ops note → applications; four items, Mike-approved order).
+1. **NEXT CONTEXT: draft the blog post** (item 1 of the portfolio stream — Mike's go given). Seeds: `DECISION-MEMO.md` **including the v0.2.2 postscript (grilling-is-arm-C, 2026-10-06 — the freshest angle, work it into the arc)**; working title *"I pre-registered an AI experiment, it failed, and that's the point."* Full stream order + the publishing gate (Mike's name, Mike's call): `HANDOFF-2026-10-05-NEXT-STEPS.md`.
 2. Track-2 judge re-run decision (Mike's go required) — plumbing is fixed; a small (<$0.50) Track-2-only re-run would validate the panel, but it is NEW SPEND and needs a dated prereg addendum BEFORE data per HANDOFF-V02-PIVOT.
 3. Exercise `debate` mode end-to-end.
 4. Build + test Door B (OpenCodeGo subagents) inside OpenCode.
